@@ -32,12 +32,12 @@ def add_img(tab, obj):
 def close_img(img):
     """
 
-    :param img: img index in gallery , Key to pop
+    :param img: img index in tab_gallery , Key to pop
     :return:
     """
     global gallery
     gallery.pop(img)
-    # item = sorted(self.gallery)[-1] + 1
+    # item = sorted(self.tab_gallery)[-1] + 1
     # print("\nitem after close : %d"% item)
 
 

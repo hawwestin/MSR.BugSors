@@ -14,18 +14,18 @@ DCOM = CommentData()
 
 
 class NavPanel(tk.Frame):
-    def __init__(self, tkControler, parentFrame):
+    def __init__(self, main_window, parent_frame):
         """
 
             dList
             dList_gallery   słownik którego kluczem jest tekst wyświetlany
                             na liście wpisów w panelu nawigacyjnym, wartość
                             jest to ID zapisanego pod daną pozycją Delate.
-        :param tkControler:
-        :param parentFrame:
+        :param main_window:
+        :param parent_frame:
         """
-        tk.Frame.__init__(self, master=parentFrame)
-        self.tkController = tkControler
+        tk.Frame.__init__(self, master=parent_frame)
+        self.tkController = main_window
 
         self.menurow = tk.Frame(self)
         self.menurow.pack(side=tk.TOP)
@@ -64,7 +64,12 @@ class NavPanel(tk.Frame):
             self.populate_delate_list()
 
     def populate_delate_list(self):
+        '''
+        populate listbox with instances
+        :return:
+        '''
         self.dlist.delete(0, tk.END)
+        # todo remake formating in cusomizable table .
         self.dlist.insert(tk.END, "{:<5s} {:<15s}".format(DC.ID, DC.NAME))
         for row in sorted(delates.delateList):
             self.dlist.insert(tk.END, self.format_name(delates.delateDict[row].id,

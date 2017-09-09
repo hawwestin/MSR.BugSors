@@ -31,7 +31,7 @@ class MenuCmd:
         popup.mainloop()
 
     def info(self):
-        self.popupmsg("BugSors\nMichał Robaszewski\nDamian Patoka\n2017")
+        self.popupmsg("MSR BugSors\nMichał Robaszewski\n2017")
 
     def save(self):
         tab_id = self.tkController.notebook.select()

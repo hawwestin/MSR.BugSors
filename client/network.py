@@ -8,7 +8,7 @@ from data_config import atDict
 from user import user
 
 
-class Connection:
+class ServerConnection:
     """
     todo read connection setting fromUI and set in innit.
     reset and change this value by Setters and getters methods.
@@ -221,4 +221,4 @@ class Connection:
 if __name__ == '__main__':
     pass
 else:
-    con = Connection()
+    con = ServerConnection()
