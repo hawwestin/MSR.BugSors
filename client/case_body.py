@@ -1,5 +1,6 @@
-class DelateInstance:
+class CaseInstance:
     def __init__(self, id, name, desc, app, ass, stat, create, mtime, mby):
+        # todo remake to kwargs
         self.id = id
         self.name = name
         self.description = desc
@@ -61,3 +62,10 @@ class DelateInstance:
             self._modify_by = value
         else:
             self._modify_by = ""
+
+    def post_data(self):
+        """
+        provide formated string to insert to db
+        :return:
+        """
+        return

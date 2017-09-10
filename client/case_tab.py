@@ -2,18 +2,18 @@ import datetime
 import tkinter as tk
 from tkinter import ttk
 
-from comment import Comment
+from step import Step
 from data_config import atDict
-from data_config import dc
+from data_config import StepData
 from data_config import ds
 from data_config import ad
-from delate import delates
+from case import case
 from network import con
 from user import user
 from tk_scrolled_frame import VerticalScrolledFrame as ScrolledFrame
 
 
-class DelateTab:
+class CaseTab:
     def __init__(self, tkControler, parentFrame, delate):
         self.tkControler = tkControler
         self.parentframe = parentFrame
@@ -62,7 +62,7 @@ class DelateTab:
         if int(self.data.id) > 0:
             # self.new_comment = False
             self.dicComments_gallery = {}
-            self.comments()
+            self.steps()
 
         self.update_comment = False
 
@@ -101,7 +101,7 @@ class DelateTab:
 
         if int(self.data.id) > 0:
             bKomentuj = ttk.Button(self.but_line, text="Skomentuj",
-                                   command=self.add_comment_popup)
+                                   command=self.add_step_popup)
             bKomentuj.grid(row=0, column=self.button_column, sticky='nsw')
 
         bClose = ttk.Button(self.but_line, text="Zamknij", command=self.tkControler.close_Current_tab)
@@ -197,27 +197,27 @@ class DelateTab:
                                pady=_pady,
                                sticky='wn')
 
-    def comments(self):
-        # todo skasuj istniejące framy w label frame comments i wstaw ponownie.
+    def steps(self):
+        # todo skasuj istniejące framy w label frame steps i wstaw ponownie.
         self.com_frame.destroy()
         self.com_frame = ScrolledFrame(self.com_frame_outline)
         self.com_frame.pack(anchor=tk.NW, fill=tk.BOTH, expand=True)
 
-        items = con.get_comments(self.data.id)
+        items = con.get_steps(self.data.id)
 
         if len(items) == 0:
             # todo statusbar
             return
         # todo order by id . by najstarsze byly nadole.
         for com in items:
-            com_id = str(com.get(dc.ID, 0))
-            if str(com.get(dc.IS_ACTIVE, 0)) == "1" and com_id is not 0:
+            com_id = str(com.get(StepData.ID, 0))
+            if str(com.get(StepData.IS_ACTIVE, 0)) == "1" and com_id is not 0:
                 frame = tk.LabelFrame(self.com_frame.interior)
                 frame.pack(fill=tk.BOTH, expand=True, anchor='nw')
-                self.dicComments_gallery[com_id] = Comment(frame, com)
+                self.dicComments_gallery[com_id] = Step(frame, com)
 
-    def add_comment_popup(self, title=""):
-        default_msg = "Nowy komentarz"
+    def add_step_popup(self, title=""):
+        default_msg = "Nowy krok"
         if title == "":
             text = default_msg
         else:
@@ -229,12 +229,12 @@ class DelateTab:
                 self.update_comment = True
             else:
                 com = e_text.get("1.0", 'end-1c')
-            if self.add_comment(com) == 1:
+            if self.add_step(com) == 1:
                 self.aktualizuj()
             popup.destroy()
 
         popup = tk.Toplevel()
-        popup.wm_title("Dodaj komentarz")
+        popup.wm_title("Dodaj krok")
         # popup.geometry("240x180")
         label = ttk.Label(popup, text=text, justify=tk.CENTER)
         label.pack(pady=20, padx=20)
@@ -247,26 +247,26 @@ class DelateTab:
 
         popup.mainloop()
 
-    def add_comment(self, text):
+    def add_step(self, text):
         """
 
         :return:
         """
-        com = {dc.APPLICANT: user.user_id,
-               dc.IS_ACTIVE: 1,
-               dc.CREATED_DT: datetime.datetime.now(),
-               dc.DELATE_ID: self.data.id,
-               dc.COMMENT: text,
-               dc.ID: "0",
-               dc.MODIFY_TIME: ""
-               }
+        step = {StepData.APPLICANT: user.user_id,
+                StepData.IS_ACTIVE: 1,
+                StepData.CREATED_DT: datetime.datetime.now(),
+                StepData.DELATE_ID: self.data.id,
+                StepData.COMMENT: text,
+                StepData.ID: "0",
+                StepData.MODIFY_TIME: ""
+                }
 
-        response = con.post_comment(com)
+        response = con.post_step(step)
 
         if len(response) == 0:
             return 0
         else:
-            self.comments()
+            self.steps()
             return 1
 
     def control(self, disable=True):
@@ -298,7 +298,7 @@ class DelateTab:
         if int(user.user_type) == int(atDict.admin):
             self.data.assigned = ad.user_idx(self.cbAssigned.get())
 
-        if delates.send_new_delate(self.data):
+        if case.send_new_delate(self.data):
             self.tkControler.navigator.populate_delate_list()
             self.destroy()
 
@@ -314,7 +314,7 @@ class DelateTab:
             if self.update_comment:
                 self.update_comment = False
             else:
-                self.add_comment_popup(
+                self.add_step_popup(
                     "Zmiana statusu {} -> {}".format(ds.state_name(self.data.status), self.cbStatus.get()))
                 return
 
@@ -325,12 +325,12 @@ class DelateTab:
         self.data.assigned = ad.user_idx(self.cbAssigned.get())
         self.data.status = ds.state_idx(self.cbStatus.get())
 
-        if delates.save_delate(self.data):
+        if case.save_delate(self.data):
             self.tkControler.navigator.populate_delate_list()
             if name_change:
                 self.tkControler.rename_tab(self.tkControler.navigator.format_name(self.data.id, self.data.name),
                                             delate_tab=self)
-            self.data = delates.delateDict.get(int(self.data.id))
+            self.data = case.delateDict.get(int(self.data.id))
             self.cofnij()
 
     def cofnij(self):

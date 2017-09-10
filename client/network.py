@@ -2,13 +2,14 @@ import json
 import socket
 import time
 
-from data_config import dd
-from data_config import dc
+from data_config import CaseData
+from data_config import StepData
 from data_config import atDict
 from user import user
+from connections import ConnectBase
 
 
-class ServerConnection:
+class ServerConnection(ConnectBase):
     """
     todo read connection setting fromUI and set in innit.
     reset and change this value by Setters and getters methods.
@@ -131,7 +132,7 @@ class ServerConnection:
         Pobieranie wartosci dla wpisu o incydencie.
         """
         req = {"method": "GET",
-               "path": "/delates"}
+               "path": "/case"}
         return self._read_data(json.dumps(req))
 
     def get_delate_by_id(self, idx):
@@ -141,74 +142,74 @@ class ServerConnection:
         :return:
         """
         request = {"method": "GET",
-                   "path": "/delates/id/" + idx}
+                   "path": "/case/id/" + idx}
         return self._read_data(json.dumps(request))
 
-    def GetDelateByAplicant(self, idx):
+    def get_delate_by_applicant(self, idx):
         request = {"method": "GET",
-                   "path": "/delates/applicant/" + idx}
+                   "path": "/case/applicant/" + idx}
         return self._read_data(json.dumps(request))
 
-    def GetDelateByAssign(self, idx):
+    def get_delate_by_assign(self, idx):
         request = {"method": "GET",
-                   "path": "/delates/assign/" + idx}
+                   "path": "/case/assign/" + idx}
         return self._read_data(json.dumps(request))
 
-    def get_comments(self, idx):
+    def get_steps(self, idx):
         request = {"method": "GET",
-                   "path": "/comments/id/" + str(idx)}
+                   "path": "/steps/id/" + str(idx)}
         return self._read_data(json.dumps(request))
 
-    def put_delate(self, delate):
+    def put_case(self, delate):
         """
         Aktualizacja wpisu.
         :param delate:
         :return:
         """
-        requestparams = {dd.NAME: delate.name,
-                         dd.DESCRIPTION: delate.description,
-                         dd.STATUS: str(delate.status)}
+        requestparams = {CaseData.NAME: delate.name,
+                         CaseData.DESCRIPTION: delate.description,
+                         CaseData.STATUS: str(delate.status)}
         if int(user.user_type) == int(atDict.admin) and str(delate.assigned) != "":
-            requestparams[dd.ASSIGNED] = str(delate.assigned)
+            requestparams[CaseData.ASSIGNED] = str(delate.assigned)
 
         request = {"method": "PUT",
-                   "path": "/delates/id/" + delate.id,
+                   "path": "/case/id/" + delate.id,
                    "params": requestparams}
         return self._read_data(json.dumps(request))
 
-    def post_delate(self, delate):
+    def post_case(self, delate):
         """
         Stworzenie wpisu
         :param delate:
         :return: ID utworzonego wpisu
         """
-        requestparams = {dd.NAME: delate.name,
-                         dd.DESCRIPTION: delate.description,
-                         dd.APPLICANT: str(user.user_id),
-                         dd.STATUS: str(delate.status)}
+        requestparams = {CaseData.NAME: delate.name,
+                         CaseData.DESCRIPTION: delate.description,
+                         CaseData.APPLICANT: str(user.user_id),
+                         CaseData.STATUS: str(delate.status)}
         if int(user.user_type) == int(atDict.admin) and str(delate.assigned) != "":
-            requestparams[dd.ASSIGNED] = str(delate.assigned)
+            requestparams[CaseData.ASSIGNED] = str(delate.assigned)
 
         request = {"method": "POST",
-                   "path": "/delates",
+                   "path": "/case",
                    "params": requestparams}
 
         return self._read_data(json.dumps(request))
 
-    def post_comment(self, comment):
-        requestparams = {dc.COMMENT: comment[dc.COMMENT],
-                         "delateid": comment[dc.DELATE_ID]}
+    def post_step(self, comment):
+        requestparams = {StepData.COMMENT: comment[StepData.COMMENT],
+                         "delateid": comment[StepData.DELATE_ID]}
         request = {"params": requestparams,
                    "method": "POST",
-                   "path": "/comments"}
+                   "path": "/steps"}
 
         return self._read_data(json.dumps(request))
 
-    def put_comment(self, comment):
-        requestparams = {dc.COMMENT: comment[dc.COMMENT]}
+    def put_step(self, comment):
+        requestparams = {StepData.COMMENT: comment[StepData.COMMENT]}
         request = {"params": requestparams,
                    "method": "PUT",
-                   "path": "/comments/id/" + comment[dc.ID]}
+                   "path": "/steps/id/" + comment[StepData.ID]}
 
         return self._read_data(json.dumps(request))
 

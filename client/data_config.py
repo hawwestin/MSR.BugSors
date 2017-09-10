@@ -6,28 +6,49 @@ Module is made for configuration constant served by server response
 """
 
 
-class DelateData:
-    def __init__(self):
-        self.MODIFY_BY = "modify_by"
-        self.ID = "id"
-        self.APPLICANT = "applicant"
-        self.DESCRIPTION = "description"
-        self.CREATE_TIME = "create_time"
-        self.STATUS = "status"
-        self.NAME = "name"
-        self.ASSIGNED = "assigned"
-        self.MODIFY_TIME = "modify_time"
+class CaseData:
+    ID = "id"
+    NAME = "name"
+    DESCRIPTION = "description"
+    STATUS = "status"
+    PRIORITY = "priority"
+    OBJECTIVE = "objective"
+    EXPECTED_RESULT = "expected_results"
+    POST_CONDITION = "post_conditions"
+
+    APPLICANT = "applicant"
+    CREATE_TIME = "create_time"
+    MODIFY_TIME = "modify_time"
+    MODIFY_BY = "modify_by"
+    IS_ACTIVE = "is_active"
+
+    put = [NAME, DESCRIPTION, STATUS, PRIORITY, OBJECTIVE, EXPECTED_RESULT, POST_CONDITION, MODIFY_BY, IS_ACTIVE]
+    post = [NAME, DESCRIPTION, STATUS, PRIORITY, OBJECTIVE, EXPECTED_RESULT, POST_CONDITION, APPLICANT, IS_ACTIVE]
 
 
-class CommentData:
+class StepData:
+    ID = "id"
+    NAME = "name"
+    DESCRIPTION = "description"
+    ASSEMBLY = "assembly"
+    TYPE = "type"
+
+    APPLICANT = "applicant"
+    CREATE_TIME = "create_time"
+    MODIFY_TIME = "modify_time"
+    MODIFY_BY = "modify_by"
+    IS_ACTIVE = "is_active"
+
+    put = [NAME, DESCRIPTION, ASSEMBLY, TYPE, MODIFY_BY, IS_ACTIVE]
+    post = [NAME, DESCRIPTION, ASSEMBLY, TYPE, APPLICANT, IS_ACTIVE]
+
+
+class CaseSteps:
     def __init__(self):
-        self.APPLICANT = "applicant"
-        self.IS_ACTIVE = "is_active"
-        self.CREATED_DT = "created_datetime"
-        self.DELATE_ID = "delate_id"
-        self.COMMENT = "comment"
         self.ID = "id"
-        self.MODIFY_TIME = "modify_time"
+        self.CASE_ID = "case_id"
+        self.PREVIOUS_STEP_ID = "previous_step_id"
+        self.STEP_ID = "step_id"
 
 
 # todo setup values according to server response
@@ -96,6 +117,7 @@ class DelatState:
         except ValueError:
             return ""
 
+
 class Accounts:
     def __init__(self):
         self._adict = {}
@@ -134,12 +156,11 @@ class Accounts:
         except ValueError:
             return ""
 
+
 if __name__ == '__main__':
     mydict = {1: 'Otwarte', 2: 'Przypisane', 3: 'Rozwiązane'}
     print(list(mydict.keys())[list(mydict.values()).index('Przypisane')])
 else:
-    dd = DelateData()
-    dc = CommentData()
     atDict = AccountType()
     ds = DelatState()
     ad = Accounts()

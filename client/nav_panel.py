@@ -2,15 +2,15 @@ import tkinter as tk
 from tkinter import font
 from tkinter import ttk
 
-from data_config import DelateData
-from data_config import CommentData
+from data_config import CaseData
+from data_config import StepData
 from utils import populate_constants
-from delate import delates
+from case import case
 from settings_window import Settings
 from user import user
 
-DC = DelateData()
-DCOM = CommentData()
+DC = CaseData()
+DCOM = StepData()
 
 
 class NavPanel(tk.Frame):
@@ -60,7 +60,7 @@ class NavPanel(tk.Frame):
             Settings(self.tkController)
         else:
             populate_constants()
-            delates.get_delate()
+            case.get_delate()
             self.populate_delate_list()
 
     def populate_delate_list(self):
@@ -71,11 +71,11 @@ class NavPanel(tk.Frame):
         self.dlist.delete(0, tk.END)
         # todo remake formating in cusomizable table .
         self.dlist.insert(tk.END, "{:<5s} {:<15s}".format(DC.ID, DC.NAME))
-        for row in sorted(delates.delateList):
-            self.dlist.insert(tk.END, self.format_name(delates.delateDict[row].id,
-                                                       delates.delateDict[row].name))
+        for row in sorted(case.delateList):
+            self.dlist.insert(tk.END, self.format_name(case.delateDict[row].id,
+                                                       case.delateDict[row].name))
             # Zbudowanie slownika łączącego numer wiersza z wpisanym do niego Delate id
-            self.dList_gallery[self.dlist.get(tk.END)] = delates.delateDict[row].id
+            self.dList_gallery[self.dlist.get(tk.END)] = case.delateDict[row].id
 
     def format_name(self, idx, name):
         return "{:<5} {:<15}".format(idx, name)

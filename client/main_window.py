@@ -3,14 +3,16 @@ import json
 import tkinter as tk
 from tkinter import ttk
 
-import client.delate_tab as delate_tab
+import client.case_tab as delate_tab
 import client.utils as utils
-from client.delate import delates
-from client.menubar import *
+from client.case import case
+from client.menu_bar import *
 from client.nav_panel import NavPanel
 from client.database import database
+from menu_command import MenuCmd
 
 class Window(tk.Tk):
+
     def __init__(self, *args, **kwargs):
         """
         Self its TK and Controler -> parent is a Frame
@@ -27,9 +29,16 @@ class Window(tk.Tk):
                                             sashrelief=tk.RIDGE)
         self.containerBody.pack(fill=tk.BOTH, expand=True)
 
+        database.prepare_db()
 
-        MainMenu(self)
-        self.statusbar()
+        self.menu_command = MenuCmd(self)
+        self.main_menu = MainMenu(self)
+
+        utils.status_message = tk.StringVar()
+        utils.status_message.set('')
+        self.status_bar = tk.Label(self, textvariable=utils.status_message, bd=1, relief=tk.SUNKEN,
+                                   anchor='w')
+        self.status_bar.pack(side=tk.BOTTOM, fill=tk.X)
 
         self.navigator = NavPanel(self, self.containerBody)
         self.containerBody.add(self.navigator, sticky='wns')
@@ -63,25 +72,34 @@ class Window(tk.Tk):
         self.style.map('TNotebook.Tab', background=[('selected', _compcolor), ('active', _ana2color)])
 
     def new_tab(self, name, del_id):
+        """
+        Check if tab is already open if is open switch to it.
+        If not open yet create new frame and append it to notebook with new tab object.
+
+        If tab_id == 0  indicate to create brand new object locally and append it to lists and dicts
+        :param name:
+        :param del_id:
+        :return:
+        """
         for tab_id in self.notebook.tabs():
             tab_name = self.notebook.tab(tab_id, "text")
             if self.tab_gallery.get(tab_name, -1) != -1 and tab_name == name:
                 self.notebook.select(tab_id)
                 if name == "*New": #todo check if is valid
-                    self.tab_gallery[name].data = delates.create_delate_localy()
+                    self.tab_gallery[name].data = case.create_case_locally()
                 return
 
         frame = ttk.Frame(self.notebook)
         frame.pack(fill=BOTH, expand=1)
         # todo dodawany jest podwójnie raz jako id 0 na liscie a raz pod id pobranym z serwera.
         if del_id > 0:
-            if delates.delateDict.get(del_id, 0) != 0:
-                self.tab_gallery[name] = delate_tab.DelateTab(self, frame, delates.delateDict.get(del_id))
+            if case.delateDict.get(del_id, 0) != 0:
+                self.tab_gallery[name] = delate_tab.CaseTab(self, frame, case.delateDict.get(del_id))
             else:
-                print(json.dumps(delates.delateDict))
+                print(json.dumps(case.delateDict))
 
         else:
-            self.tab_gallery[name] = delate_tab.DelateTab(self, frame, delates.create_delate_localy())
+            self.tab_gallery[name] = delate_tab.CaseTab(self, frame, case.create_case_locally())
         self.notebook.add(frame, text=name)
         self.notebook.select(self.notebook.index(tk.END)-1)
 
@@ -92,10 +110,6 @@ class Window(tk.Tk):
         tab = self.notebook.index("current")
         self.notebook.tab(tab, text=name)
         self.tab_gallery[name] = delate_tab
-
-    def statusbar(self):
-        utils.statusbar = Label(self, text=utils.statusmsg, bd=1, relief=SUNKEN, anchor=W)
-        utils.statusbar.pack(side=BOTTOM, fill=X)
 
     def close_Current_tab(self):
         id = self.notebook.select()
