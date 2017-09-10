@@ -17,7 +17,6 @@ class Case:
                  CaseData.NAME: "Nazwa",
                  CaseData.DESCRIPTION: "Opis",
                  CaseData.APPLICANT: user.user_id,
-                 CaseData.ASSIGNED: "",
                  CaseData.CREATE_TIME: datetime.datetime.now(),# todo czas bez mikrosekund jest zwracany przez serwer.
                  CaseData.STATUS: 1,
                  CaseData.MODIFY_TIME: None,
@@ -57,16 +56,7 @@ class Case:
         :param chunk: Json that holds data to populate CaseInstance
         :return:
         """
-        item = CaseInstance(id=chunk[CaseData.ID],
-                            name=chunk[CaseData.NAME],
-                            desc=chunk[CaseData.DESCRIPTION],
-                            app=chunk[CaseData.APPLICANT],
-                            ass=chunk[CaseData.ASSIGNED],
-                            create=chunk[CaseData.CREATE_TIME],
-                            stat=chunk[CaseData.STATUS],
-                            mtime=chunk[CaseData.MODIFY_TIME],
-                            mby=chunk[CaseData.MODIFY_BY])
-        item.aggregated = chunk
+        item = CaseInstance(chunk)
         self.delateDict[int(chunk[CaseData.ID])] = item
         if int(chunk[CaseData.ID]) not in self.delateList:
             self.delateList.append(int(chunk[CaseData.ID]))

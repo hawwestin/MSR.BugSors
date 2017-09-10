@@ -2,6 +2,7 @@ import sqlite3
 import os.path
 from connections import ConnectBase
 from data_config import StepData
+from data_config import CaseData
 
 
 class Database(ConnectBase):
@@ -42,11 +43,6 @@ class Database(ConnectBase):
             pass
 
     def put_step(self, step):
-        """
-        Update step
-        :param step: StepBody object
-        :return:
-        """
         sql = "UPDATE [sh.Step] SET {} WHERE {}"
         values = step.put_data()
 
@@ -94,12 +90,18 @@ class Database(ConnectBase):
         self.connection.commit()
 
     def post_case(self, case):
-        # ////
         sql = "INSERT INTO [sh.TestCase] ({0}) VALUES ({1});"
         values = case.post_data()
 
-        self.cursor.executescript(sql)
-        self.connection.commit()
+        sql = sql.format(', '.join(CaseData.post), values)
+        print(sql)
+        try:
+            self.cursor.executescript(sql)
+        except sqlite3.IntegrityError:
+            # todo statusbar logger
+            raise
+        else:
+            self.connection.commit()
 
     def login(self):
         sql = ""
@@ -136,19 +138,34 @@ class Database(ConnectBase):
 
 
 if __name__ == '__main__':
-    from step_body import StepBody, StepData
+    # from step_body import StepBody, StepData
+    from case_body import CaseInstance
     db = Database()
     db.configure()
+    # data = {}
+    # data[StepData.NAME] = "lister "
+    # data[StepData.ID] = "2"
+    # data[StepData.DESCRIPTION] = "descripDAWdtion"
+    # data[StepData.ASSEMBLY] = "1"
+    # data[StepData.TYPE] = "1"
+    # data[StepData.APPLICANT] = "1"
+    # data[StepData.MODIFY_BY] = "1"
+    # data[StepData.IS_ACTIVE] = "true"
+    # body = StepBody(data)
+    # db.put_step(body)
     data = {}
-    data[StepData.NAME] = "lister "
-    data[StepData.ID] = "2"
-    data[StepData.DESCRIPTION] = "descripDAWdtion"
-    data[StepData.ASSEMBLY] = "1"
-    data[StepData.TYPE] = "1"
-    data[StepData.APPLICANT] = "1"
-    data[StepData.MODIFY_BY] = "1"
-    data[StepData.IS_ACTIVE] = "true"
-    body = StepBody(data)
-    db.put_step(body)
+    data[CaseData.ID] = '1'
+    data[CaseData.NAME] = 'name3'
+    data[CaseData.DESCRIPTION] = 'desc23'
+    data[CaseData.STATUS] = '1'
+    data[CaseData.PRIORITY] = '1'
+    data[CaseData.OBJECTIVE] = 'obj2'
+    data[CaseData.EXPECTED_RESULT] = 'exp23'
+    data[CaseData.POST_CONDITION] = 'post cond23'
+    data[CaseData.APPLICANT] = '1'
+    data[CaseData.IS_ACTIVE] = '1'
+    case = CaseInstance(data)
+    db.post_case(case)
+
 else:
     database = Database()

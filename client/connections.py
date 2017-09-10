@@ -64,6 +64,11 @@ class ConnectBase(metaclass=abc.ABCMeta):
 
     @abc.abstractmethod
     def post_case(self, case):
+        """
+        Insert new case
+        :param case:
+        :return:
+        """
         pass
 
     @abc.abstractmethod
