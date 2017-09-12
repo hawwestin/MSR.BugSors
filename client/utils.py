@@ -1,8 +1,7 @@
-from data_config import ds
-from data_config import atDict
+from connection import connection
 from data_config import ad
-from network import con
-
+from data_config import atDict
+from data_config import ds
 
 '''
 tk.StringVar()
@@ -16,6 +15,6 @@ SMALL_FONT = ("Helvetica", 8)
 
 
 def populate_constants():
-    ds.dict_state = con.get_dict_states()
-    atDict.atDict = con.get_dict_acc_type()
-    ad.adict = con.get_users()
+    ds.dict_state = connection.get_dict_states()
+    atDict.atDict = connection.get_dict_acc_type()
+    ad.adict = connection.get_users()

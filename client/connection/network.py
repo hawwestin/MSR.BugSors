@@ -2,11 +2,11 @@ import json
 import socket
 import time
 
+from connection.connect_base import ConnectBase
 from data_config import CaseData
 from data_config import StepData
 from data_config import atDict
 from user import user
-from connections import ConnectBase
 
 
 class ServerConnection(ConnectBase):
@@ -15,15 +15,24 @@ class ServerConnection(ConnectBase):
     reset and change this value by Setters and getters methods.
     """
 
-    def __init__(self, port=12345, servaddr="127.0.0.1"):
-        self.port = port
-        self.servaddr = servaddr
+    def add_user(self, user):
+        pass
+
+    def __init__(self, **kwargs):
+        """
+
+        :param kwargs:
+            adres - IP of remote server
+            port - port number on remote server.
+        """
+        self.port = kwargs.get('port', 12345)
+        self.adres = kwargs.get('adres', "127.0.0.1")
 
     # todo metoda na init słowników
 
     def configure(self, servaddr):
         # self.port = port
-        self.servaddr = servaddr
+        self.adres = servaddr
 
     def _read_data(self, request):
         """
@@ -42,7 +51,7 @@ class ServerConnection(ConnectBase):
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
             try:
                 # todo spradzenie czy podane argumenty sąpoprawne.
-                s.connect((self.servaddr, self.port))
+                s.connect((self.adres, self.port))
             except socket.gaierror:
                 # statsu bar Msg about connection cannot be established
                 return ""
@@ -145,7 +154,7 @@ class ServerConnection(ConnectBase):
                    "path": "/case/id/" + idx}
         return self._read_data(json.dumps(request))
 
-    def get_delate_by_applicant(self, idx):
+    def get_case_by_applicant(self, idx):
         request = {"method": "GET",
                    "path": "/case/applicant/" + idx}
         return self._read_data(json.dumps(request))
@@ -218,8 +227,3 @@ class ServerConnection(ConnectBase):
                    "path": "/users"}
         return self._read_data(json.dumps(request))
 
-
-if __name__ == '__main__':
-    pass
-else:
-    con = ServerConnection()

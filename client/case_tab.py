@@ -2,15 +2,15 @@ import datetime
 import tkinter as tk
 from tkinter import ttk
 
-from step import Step
-from data_config import atDict
-from data_config import StepData
-from data_config import ds
-from data_config import ad
 from case import case
-from network import con
-from user import user
+from connection import connection
+from data_config import StepData
+from data_config import ad
+from data_config import atDict
+from data_config import ds
+from step import Step
 from tk_scrolled_frame import VerticalScrolledFrame as ScrolledFrame
+from user import user
 
 
 class CaseTab:
@@ -203,7 +203,7 @@ class CaseTab:
         self.com_frame = ScrolledFrame(self.com_frame_outline)
         self.com_frame.pack(anchor=tk.NW, fill=tk.BOTH, expand=True)
 
-        items = con.get_steps(self.data.id)
+        items = connection.get_steps(self.data.id)
 
         if len(items) == 0:
             # todo statusbar
@@ -261,7 +261,7 @@ class CaseTab:
                 StepData.MODIFY_TIME: ""
                 }
 
-        response = con.post_step(step)
+        response = connection.post_step(step)
 
         if len(response) == 0:
             return 0

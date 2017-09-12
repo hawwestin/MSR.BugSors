@@ -1,10 +1,11 @@
 import tkinter as tk
 from tkinter.scrolledtext import ScrolledText
 
+from connection import connection
 from data_config import StepData
 from data_config import ad
-from network import con
 from step_body import StepBody
+
 
 class Step(tk.Frame):
     def __init__(self, tkControler, data):
@@ -43,7 +44,7 @@ class Step(tk.Frame):
     def zapisz(self):
         self.body.data[StepData.NAME] = self.e_text.get("1.0", 'end-1c')
 
-        response = con.post_step(self.body.data)
+        response = connection.post_step(self.body.data)
 
         if len(response) == 0:
             return 0

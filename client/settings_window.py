@@ -1,8 +1,8 @@
 import tkinter as tk
 
-from utils import populate_constants
-from network import con
+from connection import connection
 from user import user
+from utils import populate_constants
 
 
 class Settings:
@@ -22,7 +22,7 @@ class Settings:
         self.labelCon = tk.LabelFrame(self.window,
                                       text="Adres serwera")
         self.labelCon.pack(fill=tk.BOTH, expand=True)
-        # adress = Str
+        # adres = Str
         self.e_adress = tk.Entry(self.labelCon)
         self.confg()
 
@@ -54,7 +54,7 @@ class Settings:
     def save_addr(self):
         # todo sprawdanie poprawnosci wprowadzonego adresu
         if self.e_adress.get() != "":
-            con.configure(self.e_adress.get())
+            connection.configure(self.e_adress.get())
             self.statusbar.configure(text="Zapisano adres")
         else:
             self.statusbar.configure(text="Wprowadz adres serwera")
@@ -77,7 +77,7 @@ class Settings:
         user.login = login
         user.password = password
 
-        response = con.login()
+        response = connection.login()
         if len(response) == 0:
             return 0
         if response.get("token", 0) == 0 \

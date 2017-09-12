@@ -1,10 +1,10 @@
 import datetime
 
+from case_body import CaseInstance
+from connection import connection
 from data_config import CaseData
 from data_config import StepData
-from network import con
 from user import user
-from case_body import CaseInstance
 
 
 class Case:
@@ -26,15 +26,15 @@ class Case:
 
     def get_delate(self, idx=None):
         """
-        Decode data from serwer to case that can by didposed in Class and stored in dict _delates.List.
+        Decode data from serwer to case that can by disposed in Class and stored in dict _delates.List.
         :param idx: pobranie wpisu z bazy o konkretnym id.
         :return:
         """
         try:
             if idx is not None and int(idx) > 0:
-                items = con.get_delate_by_id(idx)
+                items = connection.get_delate_by_id(idx)
             else:
-                items = con.get_delates()
+                items = connection.get_delates()
 
             if len(items) == 0:
                 return 0
@@ -69,7 +69,7 @@ class Case:
         :param idx:
         :return:
         """
-        items = con.get_steps(idx)
+        items = connection.get_steps(idx)
 
         for item in items:
             self.delateDict[idx].dictComments[item[StepData.ID]] = items
@@ -81,7 +81,7 @@ class Case:
         :param delate:
         :return:
         """
-        ret = con.post_case(delate)
+        ret = connection.post_case(delate)
         if ret != "":
             self.__insert_delate_to_dict_collection(ret[0])
             return 1
@@ -90,7 +90,7 @@ class Case:
             # return self.get_delate(ret[0].get(DD.ID, 0))
 
     def save_delate(self, delate):
-        con.put_case(delate)
+        connection.put_case(delate)
         return self.get_delate(delate.id)
 
 

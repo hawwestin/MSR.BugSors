@@ -42,7 +42,7 @@ class ConnectBase(metaclass=abc.ABCMeta):
         pass
 
     @abc.abstractmethod
-    def get_delate_by_applicant(self, idx):
+    def get_case_by_applicant(self, idx):
         pass
 
     @abc.abstractmethod

@@ -8,8 +8,9 @@ import client.utils as utils
 from client.case import case
 from client.menu_bar import *
 from client.nav_panel import NavPanel
-from client.database import database
+import connection
 from menu_command import MenuCmd
+
 
 class Window(tk.Tk):
 
@@ -29,7 +30,9 @@ class Window(tk.Tk):
                                             sashrelief=tk.RIDGE)
         self.containerBody.pack(fill=tk.BOTH, expand=True)
 
-        database.prepare_db()
+        # switch of connection !
+        connection.com_switch.database = connection.Database(adres="../db/test_local.db")
+        connection.com_switch.connection = connection.com_switch.database
 
         self.menu_command = MenuCmd(self)
         self.main_menu = MainMenu(self)

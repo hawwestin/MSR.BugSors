@@ -5,6 +5,9 @@ Module is made for configuration constant served by server response
 * Constant from dictionaires across
 """
 
+# TODO Fetch Column names from database. Or network model. Or at least check if there is not change in contract.
+# self.cursor.execute("PRAGMA table_info([sh.TestCase]);")
+# names = self.cursor.fetchall()
 
 class CaseData:
     ID = "id"

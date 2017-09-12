@@ -52,8 +52,8 @@ class StepBody:
 
     def put_data(self):
         """
-        format object update record in database.
-        :return:
+        formatted string to update record in database.
+        :return:STRING list of pairs column name = '{value}' , ...
         """
         return ", ".join(["{} = '{}'".format(value, self.data.get(str(value), "null")) for value in StepData.put])
 
