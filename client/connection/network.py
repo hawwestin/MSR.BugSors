@@ -15,6 +15,9 @@ class ServerConnection(ConnectBase):
     reset and change this value by Setters and getters methods.
     """
 
+    def get_step(self, step_id):
+        pass
+
     def add_user(self, user):
         pass
 
@@ -164,9 +167,9 @@ class ServerConnection(ConnectBase):
                    "path": "/case/assign/" + idx}
         return self._read_data(json.dumps(request))
 
-    def get_steps(self, idx):
+    def get_steps(self, case_id):
         request = {"method": "GET",
-                   "path": "/steps/id/" + str(idx)}
+                   "path": "/steps/id/" + str(case_id)}
         return self._read_data(json.dumps(request))
 
     def put_case(self, delate):

@@ -8,15 +8,17 @@ from data_config import StepData
 from data_config import ad
 from data_config import atDict
 from data_config import ds
-from step import Step
+from step_instance import StepInstance
 from tk_scrolled_frame import VerticalScrolledFrame as ScrolledFrame
 from user import user
+from steps import Steps
 
 
 class CaseTab:
     """
     Notebook tab tkinter body that holds all widgets and aggregate data.
     """
+
     def __init__(self, main_window, parentFrame, case_instance):
         self.main_window = main_window
         self.parent_frame = parentFrame
@@ -110,10 +112,10 @@ class CaseTab:
                              command=self.undo)
         bCancel.grid(row=0, column=self.button_column, sticky='nsw')
 
-        if int(self.data.id) > 0:
-            bKomentuj = ttk.Button(self.but_line, text="Skomentuj",
-                                   command=self.add_step_popup)
-            bKomentuj.grid(row=0, column=self.button_column, sticky='nsw')
+        # if int(self.data.id) > 0:
+        #     bKomentuj = ttk.Button(self.but_line, text="Skomentuj",
+        #                            command=self.add_step_popup)
+        #     bKomentuj.grid(row=0, column=self.button_column, sticky='nsw')
 
         bClose = ttk.Button(self.but_line, text="Zamknij", command=self.main_window.close_current_tab)
         bClose.grid(row=0, column=self.button_column, sticky='nse')
@@ -223,17 +225,16 @@ class CaseTab:
         self.com_frame.pack(anchor=tk.NW, fill=tk.BOTH, expand=True)
 
         items = connection.get_steps(self.data.id)
+        items = Steps.case_steps(items)
 
         if len(items) == 0:
             # todo statusbar
             return
         # todo order by sequence.
-        for com in items:
-            com_id = str(com.get(StepData.ID, 0))
-            if str(com.get(StepData.IS_ACTIVE, 0)) == "1" and com_id != "0":
-                frame = tk.LabelFrame(self.com_frame.interior)
-                frame.pack(fill=tk.BOTH, expand=True, anchor='nw')
-                self.dicComments_gallery[com_id] = Step(frame, com)
+        for idx, data_step in enumerate(items):
+            frame = tk.LabelFrame(self.com_frame.interior)
+            frame.pack(fill=tk.BOTH, expand=True, anchor='nw')
+            self.dicComments_gallery[idx] = StepInstance(frame, data_step)
 
     def add_step_popup(self, title=""):
         """
@@ -378,7 +379,6 @@ class CaseTab:
         :return:
         """
         return "{:<5} {:<15}".format(idx, name)
-
 
     def undo(self):
         """

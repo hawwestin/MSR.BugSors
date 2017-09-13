@@ -8,6 +8,7 @@ Module is made for configuration constant served by server response
 # TODO Fetch Column names from database. Or network model. Or at least check if there is not change in contract.
 # self.cursor.execute("PRAGMA table_info([sh.TestCase]);")
 # names = self.cursor.fetchall()
+# todo add table name to class.
 
 class CaseData:
     ID = "id"
@@ -47,11 +48,10 @@ class StepData:
 
 
 class CaseSteps:
-    def __init__(self):
-        self.ID = "id"
-        self.CASE_ID = "case_id"
-        self.PREVIOUS_STEP_ID = "previous_step_id"
-        self.STEP_ID = "step_id"
+    ID = "id"
+    CASE_ID = "case_id"
+    PREVIOUS_STEP_ID = "previous_step_id"
+    STEP_ID = "step_id"
 
 
 # todo setup values according to server response

@@ -25,7 +25,7 @@ class CaseInstance:
         self.data = value
         self.update(value)
         """
-        Key - Step ID , value previous step id. to create chain. 
+        Key - StepInstance ID , value previous step id. to create chain. 
         """
         self.dictComments = {}
 

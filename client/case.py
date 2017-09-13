@@ -80,18 +80,7 @@ class Case:
         if int(chunk[CaseData.ID]) not in self.delateList:
             self.delateList.append(int(chunk[CaseData.ID]))
 
-    def DecodeComment(self, idx):
-        """
-        Decode data from serwer to steps that can by displayed on UI
 
-        There should by a delate to coresponding comment.
-        :param idx:
-        :return:
-        """
-        items = connection.get_steps(idx)
-
-        for item in items:
-            self.delateDict[idx].dictComments[item[StepData.ID]] = items
 
     def send_new_delate(self, case: CaseInstance):
         """

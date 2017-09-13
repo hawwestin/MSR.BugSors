@@ -2,10 +2,13 @@ from client.data_config import StepData
 
 
 class StepBody:
+    STEPS = {}
+
     def __init__(self, value):
         self.data = value
 
-        self.id = ""
+        self._id = None
+        self.step_id = None
         self.name = ""
         self.description = ""
         self.assembly = ""
@@ -25,7 +28,7 @@ class StepBody:
         :param value: Dictionary that contains payload from Serwer.
         :return:
         """
-        self.id = value.get(StepData.ID, self.id)
+        self.step_id = value.get(StepData.ID, self.step_id)
         self.name = value.get(StepData.NAME, self.name)
         self.description = value.get(StepData.DESCRIPTION, self.description)
         self.assembly = value.get(StepData.ASSEMBLY, self.assembly)
@@ -40,6 +43,17 @@ class StepBody:
         self.data = value
 
     @property
+    def step_id(self):
+        return self._id
+
+    @step_id.setter
+    def step_id(self, value):
+        if str(value) != str(self._id):
+            StepBody.STEPS[str(self._id)].pop()
+            StepBody.STEPS[str(value)] = self
+            self._id = str(value)
+
+    @property
     def modify_time(self):
         return self._modify_time
 
@@ -49,6 +63,15 @@ class StepBody:
             self._modify_time = value
         else:
             self._modify_time = ""
+
+    def match(self, what):
+        return what == self.step_id or what in self.name
+
+    def search(self, finder):
+        return [StepBody.STEPS[step] for step in StepBody.STEPS.keys() if StepBody.STEPS[step].match(finder)]
+
+    def __contains__(self, item):
+        return len(self.search(item)) > 0
 
     def put_data(self):
         """

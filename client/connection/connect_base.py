@@ -50,7 +50,21 @@ class ConnectBase(metaclass=abc.ABCMeta):
         pass
 
     @abc.abstractmethod
-    def get_steps(self, idx):
+    def get_steps(self, case_id):
+        """
+        Get steps bound to given case
+        :param case_id:
+        :return:
+        """
+        pass
+
+    @abc.abstractmethod
+    def get_step(self, step_id):
+        """
+        Get single Step from connection
+        :param step_id:
+        :return:
+        """
         pass
 
     @abc.abstractmethod

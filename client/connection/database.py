@@ -3,11 +3,12 @@ import sqlite3
 import pathlib
 
 from connection.connect_base import ConnectBase
-from data_config import CaseData
+from data_config import CaseData, CaseSteps
 from data_config import StepData
 
 
 class Database(ConnectBase):
+
     def __init__(self, **kwargs):
         '''
         API to communicate with local instance of database.
@@ -91,8 +92,8 @@ class Database(ConnectBase):
             self.connection.commit()
 
     def get_case_by_applicant(self, idx):
-        sql = """SELECT * FROM [sh.TestCase] WHERE applicant ={}"""
-        sql = sql.format(str(idx))
+        sql = """SELECT * FROM [sh.TestCase] WHERE {} ={}"""
+        sql = sql.format(CaseData.APPLICANT, str(idx))
         print(sql)
         try:
             self.cursor.execute(sql)
@@ -106,19 +107,39 @@ class Database(ConnectBase):
         self.connection.commit()
 
     def get_delate_by_id(self, idx):
-        sql = ""
-        self.cursor.execute(sql)
-        self.connection.commit()
+        sql = """SELECT * FROM [sh.TestCase] WHERE {} ={}"""
+        sql = sql.format(CaseData.ID, str(idx))
+        print(sql)
+        try:
+            self.cursor.execute(sql)
+        except sqlite3.OperationalError:
+            raise
+        return self._read_data(self.cursor.fetchall())
 
     def put_case(self, case):
         sql = ""
         self.cursor.execute(sql)
         self.connection.commit()
 
-    def get_steps(self, idx):
-        sql = ""
-        self.cursor.execute(sql)
-        self.connection.commit()
+    def get_steps(self, case_id):
+        sql = "SELECT * FROM [sh.CaseSteps] where {} = {}"
+        sql = sql.format(CaseSteps.CASE_ID, str(case_id))
+        print(sql)
+        try:
+            self.cursor.execute(sql)
+        except sqlite3.OperationalError:
+            raise
+        return self._read_data(self.cursor.fetchall())
+
+    def get_step(self, step_id):
+        sql = "SELECT * FROM [sh.Step] where {} = {}"
+        sql = sql.format(StepData.ID, str(step_id))
+        print(sql)
+        try:
+            self.cursor.execute(sql)
+        except sqlite3.OperationalError:
+            raise
+        return self._read_data(self.cursor.fetchall())
 
     def get_dict_states(self):
 
@@ -141,9 +162,10 @@ class Database(ConnectBase):
             self.connection.commit()
 
     def login(self):
-        sql = ""
-        self.cursor.execute(sql)
-        self.connection.commit()
+        # sql = ""
+        # self.cursor.execute(sql)
+        # self.connection.commit()
+        return {"token": "a", "user_account_type": 1, "user_id": 1}
 
     def get_delates(self, **kwargs):
         sql = ""

@@ -7,12 +7,12 @@ from data_config import ad
 from step_body import StepBody
 
 
-class Step(tk.Frame):
-    def __init__(self, tkControler, data):
+class StepInstance(tk.Frame):
+    def __init__(self, tkControler, data: StepBody):
         tk.Frame.__init__(self, master=tkControler)
         self.pack(fill=tk.BOTH, expand=True)
 
-        self.body = StepBody(data)
+        self.body = data
 
         self.e_text = ScrolledText(master=self)
 
