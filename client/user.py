@@ -2,9 +2,12 @@ from data_config import atDict
 
 
 class User:
+    """
+    simple user management class for authenticate in current connection.
+    """
     def __init__(self):
         self.login = ""
-        self._password = ""
+        self.__password = ""
         self.token = ""
         self.user_id = ""
         self.user_type = atDict.guest
@@ -15,7 +18,7 @@ class User:
         return secure format of pass
         :return:
         """
-        return self._password
+        return self.__password
 
     @password.setter
     def password(self, value):
@@ -24,10 +27,10 @@ class User:
         :param value:
         :return:
         """
-        self._password = value
+        self.__password = value
 
     def is_logged_in(self):
-        return self.login == "" or self.password == "" or self.token == ""
+        return self.login != "" or self.password != "" or self.token != ""
 
 
 if __name__ == '__main__':

@@ -5,7 +5,7 @@ from tkinter import ttk
 from data_config import CaseData
 from data_config import StepData
 from utils import populate_constants
-from case import case
+from case import case_collection
 from settings_window import Settings
 from user import user
 
@@ -25,7 +25,7 @@ class NavPanel(tk.Frame):
         :param parent_frame:
         """
         tk.Frame.__init__(self, master=parent_frame)
-        self.tkController = main_window
+        self.main_window = main_window
 
         self.menurow = tk.Frame(self)
         self.menurow.pack(side=tk.TOP)
@@ -36,14 +36,18 @@ class NavPanel(tk.Frame):
         self.dlist = None
         self.dList_gallery = {}
 
-        self.widgets()
+        self.__widgets()
 
-    def widgets(self):
+    def __widgets(self):
+        """
+        Tk widgets inside navigation frame.
+        :return:
+        """
         B1 = ttk.Button(self.menurow, text="Połącz", command=self.connect)
         B1.grid(row=0, column=0, sticky=tk.N + tk.S + tk.E + tk.W)
         # B2 = ttk.Button(self.menurow, text="szukaj")
         # B2.grid(row=0, column=1, sticky=tk.N + tk.S + tk.E + tk.W)
-        B3 = ttk.Button(self.menurow, text="Dodaj", command=self.add_delate)
+        B3 = ttk.Button(self.menurow, text="Dodaj", command=self.add_case)
         B3.grid(row=0, column=2, sticky=tk.N + tk.S + tk.E + tk.W)
 
         # preniesc font do Main window. lub innego pliku.
@@ -53,44 +57,65 @@ class NavPanel(tk.Frame):
                                 # height=15,
                                 font=list_font)
         self.dlist.pack(expand=True, fill=tk.BOTH)
-        self.dlist.bind("<Double-Button-1>", func=self.open_delate)
+        self.dlist.bind("<Double-Button-1>", func=self.open_case)
 
     def connect(self):
+        """
+        Establish connection with chosen approach.
+        :return: None
+        """
         if user.login == "" or user.password == "":
-            Settings(self.tkController)
+            Settings(self.main_window)
         else:
             populate_constants()
-            case.get_delate()
+            case_collection.get_case()
             self.populate_delate_list()
 
     def populate_delate_list(self):
-        '''
-        populate listbox with instances
-        :return:
-        '''
+        """
+        populate listbox with Case instances id and short name
+        :return: None
+        """
         self.dlist.delete(0, tk.END)
-        # todo remake formating in cusomizable table .
+        # todo remake formatting in customizable panned table .
         self.dlist.insert(tk.END, "{:<5s} {:<15s}".format(DC.ID, DC.NAME))
-        for row in sorted(case.delateList):
-            self.dlist.insert(tk.END, self.format_name(case.delateDict[row].id,
-                                                       case.delateDict[row].name))
+        for row in sorted(case_collection.delateList):
+            self.dlist.insert(tk.END, self.format_name(case_collection.delateDict[row].id,
+                                                       case_collection.delateDict[row].name))
             # Zbudowanie slownika łączącego numer wiersza z wpisanym do niego Delate id
-            self.dList_gallery[self.dlist.get(tk.END)] = case.delateDict[row].id
+            self.dList_gallery[self.dlist.get(tk.END)] = case_collection.delateDict[row].id
 
     def format_name(self, idx, name):
+        """
+        Customizable formatting. with **kwargs and unpacking dict.
+        Can by done after reformat of dList_gallery and open_case row_text variable.
+        :param idx:
+        :param name:
+        :return:
+        """
         return "{:<5} {:<15}".format(idx, name)
 
-    def open_delate(self, event):
+    def open_case(self, event):
+        """
+        Tk event handler for opening a selected row in dList.
+        :param event:
+        :return:
+        """
         widget = event.widget
         selection = widget.curselection()
-        value = widget.get(selection[0])
-        del_id = int(self.dList_gallery.get(value, 0))
+        row_text = widget.get(selection[0])
+        del_id = int(self.dList_gallery.get(row_text, 0))
+        # Row id 0 is reserved for column names and not represent any Case.
         if del_id != 0:
-            self.tkController.new_tab(value, del_id)
+            self.main_window.new_tab(row_text, del_id)
 
-    def add_delate(self):
-        if user.is_logged_in():
-            Settings(self.tkController)
+    def add_case(self):
+        """
+        Send request to main window to create new tab for new case
+        :return:
+        """
+        if not user.is_logged_in():
+            Settings(self.main_window)
         else:
             # todo is duplicated to MenuCmd
-            self.tkController.new_tab("*New", 0)
+            self.main_window.new_tab("*New", 0)

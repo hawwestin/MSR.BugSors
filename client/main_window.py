@@ -5,7 +5,8 @@ from tkinter import ttk
 
 import client.case_tab as delate_tab
 import client.utils as utils
-from client.case import case
+from case_tab import CaseTab
+from client.case import case_collection
 from client.menu_bar import *
 from client.nav_panel import NavPanel
 import connection
@@ -16,7 +17,7 @@ class Window(tk.Tk):
 
     def __init__(self, *args, **kwargs):
         """
-        Self its TK and Controler -> parent is a Frame
+        Main application class that aggregate other instances and windows.
         :param args:
         :param kwargs:
         """
@@ -52,7 +53,14 @@ class Window(tk.Tk):
         self.notebook = ttk.Notebook(self.containerRight)
         self.notebook.pack(side="top", fill="both", expand=True)
         self.notebook.enable_traversal()
+        self.notebook.bind("<<NotebookTabChanged>>", func=self.diag)
         self.tab_gallery = {}
+
+    def diag(self, event):
+        # todo check other methods for changing tabs.
+        print(event)
+        print(event.keys())
+
 
     def Stylish(self):
         _bgcolor = 'blue'  # RGV value #f5deb3
@@ -80,7 +88,7 @@ class Window(tk.Tk):
         If not open yet create new frame and append it to notebook with new tab object.
 
         If tab_id == 0  indicate to create brand new object locally and append it to lists and dicts
-        :param name:
+        :param name: tab name from self.notebook
         :param del_id:
         :return:
         """
@@ -89,32 +97,43 @@ class Window(tk.Tk):
             if self.tab_gallery.get(tab_name, -1) != -1 and tab_name == name:
                 self.notebook.select(tab_id)
                 if name == "*New": #todo check if is valid
-                    self.tab_gallery[name].data = case.create_case_locally()
-                return
+                    self.tab_gallery[name].data = case_collection.create_case_locally()
+                return None
 
         frame = ttk.Frame(self.notebook)
         frame.pack(fill=BOTH, expand=1)
         # todo dodawany jest podwójnie raz jako id 0 na liscie a raz pod id pobranym z serwera.
         if del_id > 0:
-            if case.delateDict.get(del_id, 0) != 0:
-                self.tab_gallery[name] = delate_tab.CaseTab(self, frame, case.delateDict.get(del_id))
+            if case_collection.delateDict.get(del_id, 0) != 0:
+                self.tab_gallery[name] = delate_tab.CaseTab(self, frame, case_collection.delateDict.get(del_id))
             else:
-                print(json.dumps(case.delateDict))
+                print(json.dumps(case_collection.delateDict))
 
         else:
-            self.tab_gallery[name] = delate_tab.CaseTab(self, frame, case.create_case_locally())
+            self.tab_gallery[name] = delate_tab.CaseTab(self, frame, case_collection.create_case_locally())
         self.notebook.add(frame, text=name)
         self.notebook.select(self.notebook.index(tk.END)-1)
 
         # print(self.notebook.winfo_children())
         return frame
 
-    def rename_tab(self, name, delate_tab):
+    def rename_tab(self, name, tab_body: "CaseTab"):
+        """
+        Change tab name for current selected tab.
+        :param name:
+        :param tab_body:
+        :return:
+        """
         tab = self.notebook.index("current")
         self.notebook.tab(tab, text=name)
-        self.tab_gallery[name] = delate_tab
+        # todo drop old name from tab_gallery ?
+        self.tab_gallery[name] = tab_body
 
-    def close_Current_tab(self):
+    def close_current_tab(self):
+        """
+        Call delate on case_tab instance and pop it from tab_gallery.
+        :return:
+        """
         id = self.notebook.select()
         del_id = self.notebook.tab(id, "text")
         self.notebook.forget("current")

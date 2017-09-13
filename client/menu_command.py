@@ -7,13 +7,16 @@ from settings_window import Settings
 
 
 class MenuCmd:
+    """
+    Manager class to proxy commands from Main Menu.
+    """
     def __init__(self, tkController):
-        self.tkController = tkController
+        self.main_window = tkController
 
     # todo move to MainWindow
     def client_exit(self):
-        self.tkController.quit()
-        self.tkController.destroy()
+        self.main_window.quit()
+        self.main_window.destroy()
         exit()
 
     @staticmethod
@@ -34,18 +37,20 @@ class MenuCmd:
         self.popupmsg("MSR BugSors\nMichał Robaszewski\n2017")
 
     def save(self):
-        tab_id = self.tkController.notebook.select()
-        self.tkController.gallery[tab_id].zapisz()
+        tab_id = self.main_window.notebook.select()
+        self.main_window.tab_gallery[tab_id].save_case_body()
 
     def settings(self):
-        Settings(self.tkController)
+        Settings(self.main_window)
 
-    def add_delate(self):
-        # TODO ten warunek do klasy user na is logged in true false
-        # if user.user.login == "" or user.user.password == "" or user.user.token == "":
-        if user.is_logged_in():
-            Settings(self.tkController)
+    def add_case(self):
+        """
+
+        :return:
+        """
+        if not user.is_logged_in():
+            Settings(self.main_window)
         else:
             # todo duplicated from nav_panel
-            self.tkController.new_tab("*New", 0)
+            self.main_window.new_tab("*New", 0)
 

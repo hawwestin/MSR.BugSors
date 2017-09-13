@@ -4,7 +4,7 @@ from tkinter import *
 class MainMenu:
     def __init__(self, main_window):
         """
-        Menu controller.
+        Main Menu controller.
         :param main_window: Tk from Main Window.
         """
         # Frame.__init__(self, parentFrame)
@@ -24,7 +24,7 @@ class MainMenu:
 
         file = Menu(self.menu, tearoff=0)
 
-        file.add_command(label="New", command=self.menu_command.add_delate)
+        file.add_command(label="New", command=self.menu_command.add_case)
         # file.add_cascade(label="Open connection", menu=open)
         file.add_command(label="Open connection", command=self.menu_command.settings)
         file.add_command(label="Reload")
@@ -33,7 +33,7 @@ class MainMenu:
         self.menu.add_cascade(label="File", menu=file)
 
         edit = Menu(self.menu, tearoff=0)
-        edit.add_command(label="Close Current Tab", command=self.main_window.close_Current_tab)
+        edit.add_command(label="Close Current Tab", command=self.main_window.close_current_tab)
         self.menu.add_cascade(label="Edit", menu=edit)
 
         # view = Menu(self.menu, tearoff=0)

@@ -2,7 +2,7 @@
 Module is made for configuration constant served by server response
 
 * Names of Database Columns
-* Constant from dictionaires across
+* Constant from dictionaries across application.
 """
 
 # TODO Fetch Column names from database. Or network model. Or at least check if there is not change in contract.

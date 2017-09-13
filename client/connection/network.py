@@ -188,9 +188,9 @@ class ServerConnection(ConnectBase):
 
     def post_case(self, delate):
         """
-        Stworzenie wpisu
+        Create new row in db.
         :param delate:
-        :return: ID utworzonego wpisu
+        :return: One element list with ID of created row.
         """
         requestparams = {CaseData.NAME: delate.name,
                          CaseData.DESCRIPTION: delate.description,

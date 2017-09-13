@@ -6,8 +6,12 @@ from utils import populate_constants
 
 
 class Settings:
+    """
+    Support window to configure application.
+    """
     def __init__(self, tkController):
         # todo check if its open and no open another.
+
         self.tkController = tkController
         self.window = tk.Toplevel()
 
@@ -17,21 +21,21 @@ class Settings:
 
         self.e_login = tk.Entry(self.labelCrud)
         self.e_password = tk.Entry(self.labelCrud, show='*')
-        self.crud()
+        self.authenticate()
 
         self.labelCon = tk.LabelFrame(self.window,
                                       text="Adres serwera")
         self.labelCon.pack(fill=tk.BOTH, expand=True)
         # adres = Str
         self.e_adress = tk.Entry(self.labelCon)
-        self.confg()
+        self.config()
 
         self.statusbar = tk.Label(self.window, text="", bd=1, relief=tk.SUNKEN, anchor='w')
         self.statusbar.pack(side=tk.BOTTOM, fill=tk.X)
 
         self.window.mainloop()
 
-    def confg(self):
+    def config(self):
         l_adress = tk.Label(self.labelCon, text="Adres serwera")
         l_adress.grid(row=0, column=0)
         self.e_adress.grid(row=0, column=1)
@@ -39,7 +43,7 @@ class Settings:
         b_con = tk.Button(self.labelCon, text="zapisz", command=self.save_addr)
         b_con.grid()
 
-    def crud(self):
+    def authenticate(self):
         l_login = tk.Label(self.labelCrud, text="Login")
         l_login.grid(row=0, column=0)
         self.e_login.grid(row=0, column=1)

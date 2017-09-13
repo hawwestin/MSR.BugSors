@@ -2,7 +2,7 @@ from data_config import CaseData
 
 
 class CaseInstance:
-    def __init__(self, value):
+    def __init__(self, value: dict):
         # todo remake to kwargs
 
         self.id = None

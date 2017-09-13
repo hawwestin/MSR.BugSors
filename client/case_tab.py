@@ -2,7 +2,7 @@ import datetime
 import tkinter as tk
 from tkinter import ttk
 
-from case import case
+from case import case_collection
 from connection import connection
 from data_config import StepData
 from data_config import ad
@@ -14,10 +14,13 @@ from user import user
 
 
 class CaseTab:
-    def __init__(self, tkControler, parentFrame, delate):
-        self.tkControler = tkControler
-        self.parentframe = parentFrame
-        self.data = delate
+    """
+    Notebook tab tkinter body that holds all widgets and aggregate data.
+    """
+    def __init__(self, main_window, parentFrame, case_instance):
+        self.main_window = main_window
+        self.parent_frame = parentFrame
+        self.data = case_instance
 
         self.delFrame = tk.Frame(parentFrame)
         self.delFrame.pack(anchor=tk.NW, fill=tk.BOTH, expand=True)
@@ -54,10 +57,10 @@ class CaseTab:
 
         self.bAktualizuj = ttk.Button(self.but_line,
                                       text="Aktualizuj",
-                                      command=self.aktualizuj)
+                                      command=self.update)
         self.bSave = ttk.Button(self.but_line,
                                 text="Zapisz",
-                                command=self.zapisz)
+                                command=self.save_case_body)
 
         if int(self.data.id) > 0:
             # self.new_comment = False
@@ -69,11 +72,15 @@ class CaseTab:
         self.buttons()
         self.entries()
 
-        # New delate has id =0 -> explicit False
-        self.control(delate.id)
+        # New case_instance has id =0 -> explicit False
+        self.control(case_instance.id)
 
     @property
     def button_column(self):
+        """
+        Column iterator to align buttons.
+        :return: next free column
+        """
         self.__column += 1
         return self.__column
 
@@ -85,6 +92,10 @@ class CaseTab:
             self.__column = 0
 
     def buttons(self):
+        """
+        Aggregate buttons inside tab.
+        :return:
+        """
         if int(self.data.id) > 0:
             self.bAktualizuj.grid(row=0, column=self.button_column, sticky='nsw')
         else:
@@ -92,11 +103,11 @@ class CaseTab:
 
         if int(self.data.id) > 0:
             bEdit = ttk.Button(self.but_line, text="Edytuj",
-                               command=self.edytuj)
+                               command=self.edit_control)
             bEdit.grid(row=0, column=self.button_column, sticky='nsw')
 
         bCancel = ttk.Button(self.but_line, text="Cofnij",
-                             command=self.cofnij)
+                             command=self.undo)
         bCancel.grid(row=0, column=self.button_column, sticky='nsw')
 
         if int(self.data.id) > 0:
@@ -104,10 +115,14 @@ class CaseTab:
                                    command=self.add_step_popup)
             bKomentuj.grid(row=0, column=self.button_column, sticky='nsw')
 
-        bClose = ttk.Button(self.but_line, text="Zamknij", command=self.tkControler.close_Current_tab)
+        bClose = ttk.Button(self.but_line, text="Zamknij", command=self.main_window.close_current_tab)
         bClose.grid(row=0, column=self.button_column, sticky='nse')
 
     def entries(self):
+        """
+        Aggregate entries, inputs and other widgets to display data.
+        :return:
+        """
         labelRow = 0
         _padx = 8
         _pady = 3
@@ -198,6 +213,10 @@ class CaseTab:
                                sticky='wn')
 
     def steps(self):
+        """
+        Reset current added steps and fetch from current connection new list.
+        :return:
+        """
         # todo skasuj istniejące framy w label frame steps i wstaw ponownie.
         self.com_frame.destroy()
         self.com_frame = ScrolledFrame(self.com_frame_outline)
@@ -208,15 +227,20 @@ class CaseTab:
         if len(items) == 0:
             # todo statusbar
             return
-        # todo order by id . by najstarsze byly nadole.
+        # todo order by sequence.
         for com in items:
             com_id = str(com.get(StepData.ID, 0))
-            if str(com.get(StepData.IS_ACTIVE, 0)) == "1" and com_id is not 0:
+            if str(com.get(StepData.IS_ACTIVE, 0)) == "1" and com_id != "0":
                 frame = tk.LabelFrame(self.com_frame.interior)
                 frame.pack(fill=tk.BOTH, expand=True, anchor='nw')
                 self.dicComments_gallery[com_id] = Step(frame, com)
 
     def add_step_popup(self, title=""):
+        """
+        Display new window with entries to add new step.
+        :param title:
+        :return:
+        """
         default_msg = "Nowy krok"
         if title == "":
             text = default_msg
@@ -230,7 +254,7 @@ class CaseTab:
             else:
                 com = e_text.get("1.0", 'end-1c')
             if self.add_step(com) == 1:
-                self.aktualizuj()
+                self.update()
             popup.destroy()
 
         popup = tk.Toplevel()
@@ -249,7 +273,7 @@ class CaseTab:
 
     def add_step(self, text):
         """
-
+        Send new step via current connection.
         :return:
         """
         step = {StepData.APPLICANT: user.user_id,
@@ -270,6 +294,11 @@ class CaseTab:
             return 1
 
     def control(self, disable=True):
+        """
+        Switch control over ability to edit displayed data.
+        :param disable:
+        :return:
+        """
         if disable:
             cb_state = state = tk.DISABLED
         else:
@@ -285,9 +314,14 @@ class CaseTab:
         self.bAktualizuj.configure(state=state)
 
     def destroy(self):
-        self.parentframe.destroy()
+        """
+        Destroy current notebook tab.
+        :return:
+        """
+        # todo inform window.notebook about it ?
+        self.parent_frame.destroy()
 
-    def zapisz(self):
+    def save_case_body(self):
         """
         odsyła na serwer wprowadzone dane w pola , jeżeli odesłano z sukcesem zamyka karte i dodaje do listy
         :return:
@@ -298,14 +332,17 @@ class CaseTab:
         if int(user.user_type) == int(atDict.admin):
             self.data.assigned = ad.user_idx(self.cbAssigned.get())
 
-        if case.send_new_delate(self.data):
-            self.tkControler.navigator.populate_delate_list()
+        if case_collection.send_new_delate(self.data):
+            self.main_window.navigator.populate_delate_list()
             self.destroy()
+        else:
+            # todo log status bar ... error handling.
+            return None
 
-    def edytuj(self):
+    def edit_control(self):
         self.control(disable=False)
 
-    def aktualizuj(self):
+    def update(self):
         """
         zbierz dane z inputów i przeslij do serwera.
         :return:
@@ -325,17 +362,27 @@ class CaseTab:
         self.data.assigned = ad.user_idx(self.cbAssigned.get())
         self.data.status = ds.state_idx(self.cbStatus.get())
 
-        if case.save_delate(self.data):
-            self.tkControler.navigator.populate_delate_list()
+        if case_collection.save_case(self.data):
+            self.main_window.navigator.populate_delate_list()
             if name_change:
-                self.tkControler.rename_tab(self.tkControler.navigator.format_name(self.data.id, self.data.name),
-                                            delate_tab=self)
-            self.data = case.delateDict.get(int(self.data.id))
-            self.cofnij()
+                self.main_window.rename_tab(self.main_window.navigator.format_name(self.data.id, self.data.name),
+                                            tab_body=self)
+            self.data = case_collection.delateDict.get(int(self.data.id))
+            self.undo()
 
-    def cofnij(self):
+    def format_name(self, idx, name):
         """
-        wstaw w pola ponownie wartości z serwera.
+        Format tab name.
+        :param idx:
+        :param name:
+        :return:
+        """
+        return "{:<5} {:<15}".format(idx, name)
+
+
+    def undo(self):
+        """
+        Put again data from CaseInstance in data.
         :return:
         """
         self.control(False)
