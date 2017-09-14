@@ -43,11 +43,11 @@ class NavPanel(tk.Frame):
         Tk widgets inside navigation frame.
         :return:
         """
-        B1 = ttk.Button(self.menurow, text="Połącz", command=self.connect)
+        B1 = ttk.Button(self.menurow, text="Połącz", command=self.main_window.menu_command.establish_connection)
         B1.grid(row=0, column=0, sticky=tk.N + tk.S + tk.E + tk.W)
         # B2 = ttk.Button(self.menurow, text="szukaj")
         # B2.grid(row=0, column=1, sticky=tk.N + tk.S + tk.E + tk.W)
-        B3 = ttk.Button(self.menurow, text="Dodaj", command=self.add_case)
+        B3 = ttk.Button(self.menurow, text="Dodaj", command=self.main_window.menu_command.add_case)
         B3.grid(row=0, column=2, sticky=tk.N + tk.S + tk.E + tk.W)
 
         # preniesc font do Main window. lub innego pliku.
@@ -58,18 +58,6 @@ class NavPanel(tk.Frame):
                                 font=list_font)
         self.dlist.pack(expand=True, fill=tk.BOTH)
         self.dlist.bind("<Double-Button-1>", func=self.open_case)
-
-    def connect(self):
-        """
-        Establish connection with chosen approach.
-        :return: None
-        """
-        if user.login == "" or user.password == "":
-            Settings(self.main_window)
-        else:
-            populate_constants()
-            case_collection.get_case()
-            self.populate_delate_list()
 
     def populate_delate_list(self):
         """
@@ -108,14 +96,3 @@ class NavPanel(tk.Frame):
         # Row id 0 is reserved for column names and not represent any Case.
         if del_id != 0:
             self.main_window.new_tab(row_text, del_id)
-
-    def add_case(self):
-        """
-        Send request to main window to create new tab for new case
-        :return:
-        """
-        if not user.is_logged_in():
-            Settings(self.main_window)
-        else:
-            # todo is duplicated to MenuCmd
-            self.main_window.new_tab("*New", 0)

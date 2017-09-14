@@ -4,19 +4,20 @@ from tkinter import ttk
 
 from user import user
 from settings_window import Settings
+from utils import populate_constants
+from case import case_collection
 
 
 class MenuCmd:
     """
     Manager class to proxy commands from Main Menu.
     """
+
     def __init__(self, tkController):
         self.main_window = tkController
 
-    # todo move to MainWindow
     def client_exit(self):
         self.main_window.quit()
-        self.main_window.destroy()
         exit()
 
     @staticmethod
@@ -45,12 +46,29 @@ class MenuCmd:
 
     def add_case(self):
         """
-
+        Create new tab with new case.
         :return:
         """
         if not user.is_logged_in():
             Settings(self.main_window)
         else:
-            # todo duplicated from nav_panel
             self.main_window.new_tab("*New", 0)
 
+    def establish_connection(self):
+        """
+        Establish connection with chosen approach.
+        :return: None
+        """
+        if user.login == "" or user.password == "":
+            Settings(self.main_window)
+        else:
+            self.refresh_connection()
+
+    def refresh_connection(self):
+        """
+        Grab constants from server again.
+        :return:
+        """
+        populate_constants()
+        case_collection.get_case()
+        self.main_window.navigator.populate_delate_list()
