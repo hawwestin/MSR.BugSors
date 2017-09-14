@@ -1,4 +1,4 @@
-from connection import connection
+from connection_module import com_switch
 from data_config import ad
 from data_config import atDict
 from data_config import ds
@@ -15,6 +15,7 @@ SMALL_FONT = ("Helvetica", 8)
 
 
 def populate_constants():
-    ds.dict_state = connection.get_dict_states()
-    atDict.atDict = connection.get_dict_acc_type()
-    ad.adict = connection.get_users()
+    # ds.dict_state = com_switch.connection.get_dict_states()
+    # atDict.atDict = com_switch.connection.get_dict_acc_type()
+    # ad.adict = com_switch.connection.get_users()
+    pass

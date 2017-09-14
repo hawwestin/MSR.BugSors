@@ -10,6 +10,7 @@ Module is made for configuration constant served by server response
 # names = self.cursor.fetchall()
 # todo add table name to class.
 
+
 class CaseData:
     ID = "id"
     NAME = "name"
@@ -86,10 +87,6 @@ class DelatState:
         self.close_status = 5
 
     @property
-    def dict_state(self):
-        return self.__dict_states
-
-    @property
     def names(self):
         """
         :return: Sorted dict_state values.
@@ -100,6 +97,10 @@ class DelatState:
     def names_unclose(self):
         return [self.__dict_states[idx] for idx in sorted(iter(self.__dict_states.keys())) if
                 str(idx) != str(self.close_status)]
+
+    @property
+    def dict_state(self):
+        return self.__dict_states
 
     @dict_state.setter
     def dict_state(self, value):
@@ -112,7 +113,7 @@ class DelatState:
             self.__dict_states[item["id"]] = item["name"]
 
     def state_name(self, idx):
-        return self.__dict_states[str(idx)]
+        return self.__dict_states.get(str(idx),"")
 
     def state_idx(self, search):
         try:
@@ -122,6 +123,15 @@ class DelatState:
 
 
 class Accounts:
+    ID = "id"
+    NAME = "full_name"
+    LOGIN = "login"
+    Account_TYPE = "account_type"
+    PASSWORD = "password"
+    TOKEN = "token"
+    IS_ACTIVE = "is_active"
+    EMAIL = "email"
+
     def __init__(self):
         self._adict = {}
 

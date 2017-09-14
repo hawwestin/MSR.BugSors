@@ -6,7 +6,7 @@ class StepBody:
     steps_ids = set()
 
     def __init__(self, value):
-        self.data = value
+        self.data = {}
 
         self._id = None
         self.step_id = None
@@ -41,8 +41,7 @@ class StepBody:
         self.modify_by = value.get(StepData.MODIFY_BY, self.modify_by)
         self.is_active = value.get(StepData.IS_ACTIVE, self.is_active)
 
-        # todo value updated by propertis with values , this drop other data that not been changed.
-        self.data = value
+        self.data.update(value)
 
     @property
     def step_id(self):

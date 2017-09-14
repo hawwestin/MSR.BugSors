@@ -30,11 +30,11 @@ class ConnectBase(metaclass=abc.ABCMeta):
         pass
 
     @abc.abstractmethod
-    def get_delates(self, **kwargs):
+    def get_case(self):
         pass
 
     @abc.abstractmethod
-    def get_delate_by_id(self, idx):
+    def get_case_by_id(self, idx):
         pass
 
     @abc.abstractmethod
@@ -43,10 +43,6 @@ class ConnectBase(metaclass=abc.ABCMeta):
 
     @abc.abstractmethod
     def get_case_by_applicant(self, idx):
-        pass
-
-    @abc.abstractmethod
-    def get_delate_by_assign(self, idx):
         pass
 
     @abc.abstractmethod

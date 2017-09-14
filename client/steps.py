@@ -1,4 +1,4 @@
-from connection import connection, com_switch, Database
+from connection_module import  com_switch, Database
 from client.step_body import StepBody
 from data_config import CaseSteps, StepData
 
@@ -22,7 +22,7 @@ class Steps:
         if step_id in StepBody.steps_ids:
             return StepBody.STEPS.get(step_id)
         else:
-            step_body_dict = connection.get_step(step_id)
+            step_body_dict = com_switch.connection.get_step(step_id)
             if step_body_dict is not None:
                 if str(step_body_dict.get(StepData.IS_ACTIVE)) == "true":
                     return StepBody(step_body_dict)

@@ -23,4 +23,3 @@ if __name__ == '__main__':
     pass
 else:
     com_switch = Connection()
-    connection = com_switch.connection

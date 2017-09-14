@@ -2,7 +2,7 @@ import json
 import socket
 import time
 
-from connection.connect_base import ConnectBase
+from connection_module.connect_base import ConnectBase
 from data_config import CaseData
 from data_config import StepData
 from data_config import atDict
@@ -139,7 +139,7 @@ class ServerConnection(ConnectBase):
                    "path": "/dictionaries/accounttypes"}
         return self._read_data(json.dumps(request))
 
-    def get_delates(self):
+    def get_case(self):
         """
         Pobieranie wartosci dla wpisu o incydencie.
         """
@@ -147,7 +147,7 @@ class ServerConnection(ConnectBase):
                "path": "/case"}
         return self._read_data(json.dumps(req))
 
-    def get_delate_by_id(self, idx):
+    def get_case_by_id(self, idx):
         """
         Po zapisaniu wpisu potrzeba go pobrac z serwera by dostac jego
         :param idx:

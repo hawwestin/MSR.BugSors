@@ -1,7 +1,7 @@
 import datetime
 
 from case_body import CaseInstance
-from connection import connection
+from connection_module import com_switch
 from data_config import CaseData
 from data_config import StepData
 from user import user
@@ -50,9 +50,9 @@ class Case:
         """
         try:
             if idx is not None and int(idx) > 0:
-                items = connection.get_delate_by_id(idx)
+                items = com_switch.connection.get_case_by_id(idx)
             else:
-                items = connection.get_delates()
+                items = com_switch.connection.get_case()
 
             if len(items) == 0:
                 raise AssertionError("Received payload was 0 in length")
@@ -89,7 +89,7 @@ class Case:
         :param case:
         :return:
         """
-        ret = connection.post_case(case)
+        ret = com_switch.connection.post_case(case)
         if ret != "":
             self.__insert_delate_to_dict_collection(ret[0])
             # todo clear from dict and list item with id 0 to add next item clear.
@@ -104,7 +104,7 @@ class Case:
         :param case: 
         :return: 
         """
-        connection.put_case(case)
+        com_switch.connection.put_case(case)
         return self.get_case(case.id)
 
 

@@ -3,7 +3,7 @@ import tkinter as tk
 from tkinter import ttk
 
 from case import case_collection
-from connection import connection
+from connection_module import com_switch
 from data_config import StepData
 from data_config import ad
 from data_config import atDict
@@ -224,7 +224,7 @@ class CaseTab:
         self.com_frame = ScrolledFrame(self.com_frame_outline)
         self.com_frame.pack(anchor=tk.NW, fill=tk.BOTH, expand=True)
 
-        steps_order = connection.get_steps(self.data.id)
+        steps_order = com_switch.connection.get_steps(self.data.id)
         items = Steps.case_steps(steps_order)
 
         if len(items) == 0:
@@ -286,7 +286,7 @@ class CaseTab:
                 StepData.MODIFY_TIME: ""
                 }
 
-        response = connection.post_step(step)
+        response = com_switch.connection.post_step(step)
 
         if len(response) == 0:
             return 0

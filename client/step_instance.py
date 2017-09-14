@@ -1,13 +1,16 @@
 import tkinter as tk
 from tkinter.scrolledtext import ScrolledText
 
-from connection import connection
+from connection_module import com_switch
 from data_config import StepData
 from data_config import ad
 from step_body import StepBody
 
 
 class StepInstance(tk.Frame):
+    """
+    Step Instance to display data in panned window one by one in column format.
+    """
     def __init__(self, tkControler, data: StepBody):
         tk.Frame.__init__(self, master=tkControler)
         self.pack(fill=tk.BOTH, expand=True)
@@ -17,8 +20,7 @@ class StepInstance(tk.Frame):
         self.e_text = ScrolledText(master=self)
 
         self.widgets()
-        # todo Buttony : add comment , obok każdego button edytuj comment
-        # todo jeżeli masz admina lub jezeli jestes jego autorem..
+        # todo Buttony : move up/down, edytuj będzie otwierać popup do edycji.
 
     def widgets(self):
         self.e_text.grid(row=1, column=0, columnspan=4)
@@ -45,8 +47,8 @@ class StepInstance(tk.Frame):
         # todo move this to steps class ?
         # todo dont update data dict directly with out class variable.
         self.body.data[StepData.NAME] = self.e_text.get("1.0", 'end-1c')
-        response = connection.post_step(self.body.data)
+        response = com_switch.connection.post_step(self.body.data)
 
         if len(response) == 0:
             return 0
-        # todo pobierz zwrócone dane i dodaj do komentarzy.
+        # todo proces returned data and setup new StepBody.

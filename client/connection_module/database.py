@@ -2,14 +2,13 @@ import os.path
 import sqlite3
 import pathlib
 
-from connection.connect_base import ConnectBase
-from data_config import CaseData, CaseSteps
+from connection_module.connect_base import ConnectBase
+from data_config import CaseData, CaseSteps, Accounts
 from data_config import StepData
-from step_body import StepBody
+from user import user
 
 
 class Database(ConnectBase):
-
     def __init__(self, **kwargs):
         '''
         API to communicate with local instance of database.
@@ -50,13 +49,13 @@ class Database(ConnectBase):
         Prepare database schema to hold ours data i local DB.
         :return:
         """
-        # create user in empty database.
         try:
             if os.path.isfile("../db/schema.sql"):
                 with open("../db/schema.sql", 'r') as file:
                     init_sql = file.read()
                 self.cursor.executescript(init_sql)
                 self.connection.commit()
+                # todo create user in empty database add user to schema or prompt to create wia new window.
         except FileNotFoundError:
             # todo statusbar Logger
             raise
@@ -75,6 +74,7 @@ class Database(ConnectBase):
             ret_val = []
             for tup in request:
                 ret_val.append(dict(zip(names, tup)))
+            print(ret_val)
             return ret_val
         else:
             # todo logging and status bar message
@@ -102,12 +102,7 @@ class Database(ConnectBase):
             raise
         return self._read_data(self.cursor.fetchall())
 
-    def get_delate_by_assign(self, idx):
-        sql = ""
-        self.cursor.execute(sql)
-        self.connection.commit()
-
-    def get_delate_by_id(self, idx):
+    def get_case_by_id(self, idx):
         sql = """SELECT * FROM [sh.TestCase] WHERE {} ={}"""
         sql = sql.format(CaseData.ID, str(idx))
         print(sql)
@@ -118,9 +113,16 @@ class Database(ConnectBase):
         return self._read_data(self.cursor.fetchall())
 
     def put_case(self, case):
-        sql = ""
-        self.cursor.execute(sql)
-        self.connection.commit()
+        sql = "UPDATE [sh.TestCase] SET {} WHERE {}"
+        sql = sql.format(case.put_data(), "{} = '{}'".format(CaseData.ID, case.id))
+        print(sql)
+        try:
+            self.cursor.executescript(sql)
+        except sqlite3.IntegrityError:
+            # todo statusbar logger
+            raise
+        else:
+            self.connection.commit()
 
     def get_steps(self, case_id):
         sql = "SELECT * FROM [sh.CaseSteps] where {} = {}"
@@ -162,21 +164,57 @@ class Database(ConnectBase):
         else:
             self.connection.commit()
 
-    def login(self):
-        # sql = ""
-        # self.cursor.execute(sql)
-        # self.connection.commit()
-        return {"token": "a", "user_account_type": 1, "user_id": 1}
+    def authenticate(self) -> bool:
+        """
+        Check if user exist and password matches
+        :return:
+        """
+        sql = """SELECT count(ALL) FROM [sh.Users] where {} like '{}' and {} like '{}'"""
+        sql = sql.format(Accounts.LOGIN, user.login, Accounts.PASSWORD, user.password)
+        print(sql)
+        try:
+            self.cursor.execute(sql)
+        except sqlite3.OperationalError:
+            raise
+        return str(self._read_data(self.cursor.fetchall())[0].get('count(ALL)', "0")) == "1"
 
-    def get_delates(self, **kwargs):
-        sql = ""
-        self.cursor.execute(sql)
-        self.connection.commit()
+    def _token(self):
+        """
+        Menage token and refresh token. in local connection may by empty.
+        :return:
+        """
+        pass
+
+    def login(self):
+        if self.authenticate():
+            sql = """SELECT {}, {}, {} FROM [sh.Users] where {} like '{}'"""
+            sql = sql.format(Accounts.ID, Accounts.TOKEN, Accounts.Account_TYPE, Accounts.LOGIN, user.login)
+            print(sql)
+            try:
+                self.cursor.execute(sql)
+            except sqlite3.OperationalError:
+                raise
+            return self._read_data(self.cursor.fetchall())[0]
+        raise UserWarning("invalid login data.")
+
+    def get_case(self):
+        sql = """SELECT * FROM [sh.TestCase]"""
+        print(sql)
+        try:
+            self.cursor.execute(sql)
+        except sqlite3.OperationalError:
+            raise
+        return self._read_data(self.cursor.fetchall())
 
     def get_users(self):
-        sql = ""
-        self.cursor.execute(sql)
-        self.connection.commit()
+        sql = """SELECT {}, {} FROM [sh.Users]"""
+        sql = sql.format(Accounts.ID, Accounts.NAME)
+        print(sql)
+        try:
+            self.cursor.execute(sql)
+        except sqlite3.OperationalError:
+            raise
+        return self._read_data(self.cursor.fetchall())
 
     def post_step(self, step):
         sql = "INSERT INTO [sh.Step] ({0})VALUES ({1});"
@@ -200,10 +238,6 @@ class Database(ConnectBase):
 if __name__ == '__main__':
     # from step_body import StepBody, StepData
     from case_body import CaseInstance
-    from case_body import CaseInstance
-
-    db_file = pathlib.Path()
-    print(db_file.cwd())
 
     db = Database(adres="../../db/test_local.db")
     # data = {}
@@ -218,7 +252,7 @@ if __name__ == '__main__':
     # body = StepBody(data)
     # db.put_step(body)
     # data = {}
-    # data[CaseData.ID] = '1'
+    # data[CaseData.ID] = '5'
     # data[CaseData.NAME] = 'name3'
     # data[CaseData.DESCRIPTION] = 'desc23'
     # data[CaseData.STATUS] = '1'
@@ -226,10 +260,15 @@ if __name__ == '__main__':
     # data[CaseData.OBJECTIVE] = 'obj2'
     # data[CaseData.EXPECTED_RESULT] = 'exp23'
     # data[CaseData.POST_CONDITION] = 'post cond23'
-    # data[CaseData.APPLICANT] = '1'
-    # data[CaseData.IS_ACTIVE] = '1'
+    # data[CaseData.MODIFY_BY] = '2'
+    # data[CaseData.IS_ACTIVE] = 'true'
     # case = CaseInstance(data)
-    # db.post_case(case)
+    # db.put_case(case)
+    user.login = "robaszew"
+    user.password = "truecrypt"
+
+    print(db.authenticate())
+
 
 else:
     pass

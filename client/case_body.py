@@ -69,6 +69,13 @@ class CaseInstance:
         else:
             self._modify_by = ""
 
+    def put_data(self):
+        """
+        formatted string to update record in database.
+        :return:STRING list of pairs column name = '{value}' , ...
+        """
+        return ", ".join(["{} = '{}'".format(value, self.data.get(str(value), "null")) for value in CaseData.put])
+
     def post_data(self):
         """
         provide formated string to insert to db

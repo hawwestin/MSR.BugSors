@@ -9,12 +9,11 @@ from case_tab import CaseTab
 from client.case import case_collection
 from client.menu_bar import *
 from client.nav_panel import NavPanel
-import connection
+import connection_module
 from menu_command import MenuCmd
 
 
 class Window(tk.Tk):
-
     def __init__(self, *args, **kwargs):
         """
         Main application class that aggregate other instances and windows.
@@ -32,8 +31,7 @@ class Window(tk.Tk):
         self.containerBody.pack(fill=tk.BOTH, expand=True)
 
         # switch of connection !
-        connection.com_switch.database = connection.Database(adres="../db/test_local.db")
-        connection.com_switch.connection = connection.com_switch.database
+        connection_module.com_switch.connection = connection_module.Database(adres="../db/test_local.db")
 
         self.menu_command = MenuCmd(self)
         self.main_menu = MainMenu(self)
@@ -59,8 +57,7 @@ class Window(tk.Tk):
     def diag(self, event):
         # todo check other methods for changing tabs.
         print(event)
-        print(event.keys())
-
+        # print(event.keys())
 
     def Stylish(self):
         _bgcolor = 'blue'  # RGV value #f5deb3
@@ -96,7 +93,7 @@ class Window(tk.Tk):
             tab_name = self.notebook.tab(tab_id, "text")
             if self.tab_gallery.get(tab_name, -1) != -1 and tab_name == name:
                 self.notebook.select(tab_id)
-                if name == "*New": #todo check if is valid
+                if name == "*New":  # todo check if is valid
                     self.tab_gallery[name].data = case_collection.create_case_locally()
                 return None
 
@@ -106,13 +103,13 @@ class Window(tk.Tk):
         if del_id > 0:
             if case_collection.delateDict.get(del_id, 0) != 0:
                 self.tab_gallery[name] = delate_tab.CaseTab(self, frame, case_collection.delateDict.get(del_id))
-            else:
-                print(json.dumps(case_collection.delateDict))
+            # else:
+            #     print(json.dumps(case_collection.delateDict))
 
         else:
             self.tab_gallery[name] = delate_tab.CaseTab(self, frame, case_collection.create_case_locally())
         self.notebook.add(frame, text=name)
-        self.notebook.select(self.notebook.index(tk.END)-1)
+        self.notebook.select(self.notebook.index(tk.END) - 1)
 
         # print(self.notebook.winfo_children())
         return frame
