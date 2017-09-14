@@ -66,7 +66,7 @@ class CaseTab:
 
         if int(self.data.id) > 0:
             # self.new_comment = False
-            self.dicComments_gallery = {}
+            self.dic_steps_gallery = {}
             self.steps()
 
         self.update_comment = False
@@ -224,17 +224,17 @@ class CaseTab:
         self.com_frame = ScrolledFrame(self.com_frame_outline)
         self.com_frame.pack(anchor=tk.NW, fill=tk.BOTH, expand=True)
 
-        items = connection.get_steps(self.data.id)
-        items = Steps.case_steps(items)
+        steps_order = connection.get_steps(self.data.id)
+        items = Steps.case_steps(steps_order)
 
         if len(items) == 0:
             # todo statusbar
             return
-        # todo order by sequence.
+        # todo order by sequence. !!! previou next.
         for idx, data_step in enumerate(items):
             frame = tk.LabelFrame(self.com_frame.interior)
             frame.pack(fill=tk.BOTH, expand=True, anchor='nw')
-            self.dicComments_gallery[idx] = StepInstance(frame, data_step)
+            self.dic_steps_gallery[idx] = StepInstance(frame, data_step)
 
     def add_step_popup(self, title=""):
         """

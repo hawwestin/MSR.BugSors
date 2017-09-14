@@ -3,6 +3,7 @@ from client.data_config import StepData
 
 class StepBody:
     STEPS = {}
+    steps_ids = set()
 
     def __init__(self, value):
         self.data = value
@@ -40,17 +41,25 @@ class StepBody:
         self.modify_by = value.get(StepData.MODIFY_BY, self.modify_by)
         self.is_active = value.get(StepData.IS_ACTIVE, self.is_active)
 
+        # todo value updated by propertis with values , this drop other data that not been changed.
         self.data = value
 
     @property
     def step_id(self):
+        """
+        Adding new steps or modifying step id have also update Class variable caching all steps.
+        :return:
+        """
         return self._id
 
     @step_id.setter
     def step_id(self, value):
         if str(value) != str(self._id):
-            StepBody.STEPS[str(self._id)].pop()
+            if str(value) in StepBody.STEPS.keys():
+                StepBody.STEPS[str(self._id)].pop()
+                StepBody.steps_ids.remove(str(self._id))
             StepBody.STEPS[str(value)] = self
+            StepBody.steps_ids.add(str(value))
             self._id = str(value)
 
     @property
@@ -65,13 +74,30 @@ class StepBody:
             self._modify_time = ""
 
     def match(self, what):
+        """
+        Check if this Step instance match searching query.
+        Match by id and self name .
+        :param what:
+        :return:
+        """
         return what == self.step_id or what in self.name
 
-    def search(self, finder):
+    @staticmethod
+    def search(finder):
+        """
+        Search step by ID and its name
+        :param finder:
+        :return:
+        """
         return [StepBody.STEPS[step] for step in StepBody.STEPS.keys() if StepBody.STEPS[step].match(finder)]
 
     def __contains__(self, item):
-        return len(self.search(item)) > 0
+        """
+        check if step was previously cached in class variables.
+        :param item:
+        :return:
+        """
+        return item in StepBody.steps_ids
 
     def put_data(self):
         """

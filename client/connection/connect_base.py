@@ -59,7 +59,7 @@ class ConnectBase(metaclass=abc.ABCMeta):
         pass
 
     @abc.abstractmethod
-    def get_step(self, step_id):
+    def get_step(self, step_id) -> dict:
         """
         Get single Step from connection
         :param step_id:

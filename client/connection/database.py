@@ -5,6 +5,7 @@ import pathlib
 from connection.connect_base import ConnectBase
 from data_config import CaseData, CaseSteps
 from data_config import StepData
+from step_body import StepBody
 
 
 class Database(ConnectBase):
@@ -131,7 +132,7 @@ class Database(ConnectBase):
             raise
         return self._read_data(self.cursor.fetchall())
 
-    def get_step(self, step_id):
+    def get_step(self, step_id) -> dict:
         sql = "SELECT * FROM [sh.Step] where {} = {}"
         sql = sql.format(StepData.ID, str(step_id))
         print(sql)
@@ -139,7 +140,7 @@ class Database(ConnectBase):
             self.cursor.execute(sql)
         except sqlite3.OperationalError:
             raise
-        return self._read_data(self.cursor.fetchall())
+        return self._read_data(self.cursor.fetchall())[0]
 
     def get_dict_states(self):
 
@@ -229,12 +230,6 @@ if __name__ == '__main__':
     # data[CaseData.IS_ACTIVE] = '1'
     # case = CaseInstance(data)
     # db.post_case(case)
-
-    items = db.get_case_by_applicant(1)
-    for item in items:
-        x = CaseInstance(item)
-        print(x.name)
-        print(x.data)
 
 else:
     pass

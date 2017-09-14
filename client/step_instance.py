@@ -23,7 +23,7 @@ class StepInstance(tk.Frame):
     def widgets(self):
         self.e_text.grid(row=1, column=0, columnspan=4)
         self.e_text.insert("1.0", self.body.name)
-        if self.body.id != "0":
+        if self.body.step_id != "0":
             self.e_text.configure(state=tk.DISABLED, height=5, width=80)
         else:
             self.e_text.configure(state=tk.NORMAL, height=5, width=50)
@@ -42,8 +42,9 @@ class StepInstance(tk.Frame):
         l_mt.grid(row=0, column=2)
 
     def zapisz(self):
+        # todo move this to steps class ?
+        # todo dont update data dict directly with out class variable.
         self.body.data[StepData.NAME] = self.e_text.get("1.0", 'end-1c')
-
         response = connection.post_step(self.body.data)
 
         if len(response) == 0:

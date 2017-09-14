@@ -64,7 +64,7 @@ class CaseInstance:
 
     @modify_by.setter
     def modify_by(self, value):
-        if value is not None and value.lower() != "Null".lower():
+        if value is not None and str(value).lower() != "Null".lower():
             self._modify_by = value
         else:
             self._modify_by = ""
