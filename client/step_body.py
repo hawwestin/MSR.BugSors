@@ -43,6 +43,10 @@ class StepBody:
 
         self.data.update(value)
 
+    def __del__(self):
+        StepBody.STEPS.pop(self.step_id)
+        StepBody.steps_ids.remove(self.step_id)
+
     @property
     def step_id(self):
         """
@@ -53,7 +57,7 @@ class StepBody:
 
     @step_id.setter
     def step_id(self, value):
-        if str(value) != str(self._id):
+        if str(value) != str(self._id) and value is not None:
             if str(value) in StepBody.STEPS.keys():
                 StepBody.STEPS[str(self._id)].pop()
                 StepBody.steps_ids.remove(str(self._id))

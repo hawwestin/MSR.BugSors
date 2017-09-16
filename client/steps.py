@@ -1,14 +1,29 @@
-from connection_module import  com_switch, Database
+from collections import UserList
+
 from client.step_body import StepBody
+from connection_module import com_switch, Database
 from data_config import CaseSteps, StepData
 
 
-class Steps:
-    def __init__(self):
-        pass
+class Steps(list):
+    """
+    Keep order of step that are bound to Test Case.
+    """
 
-    def __contains__(self, item):
-        return len(StepBody.search(item)) > 0
+    def __setitem__(self, key, value):
+        if value in self:
+            raise ValueError("cannot repeat steps")
+        super().__setitem__(key, value)
+
+    def insert(self, index, object):
+        if object in self:
+            raise ValueError("Cannot repeat steps")
+        super().insert(index, object)
+
+    def append(self, object):
+        if object in self:
+            raise ValueError("Cannot repeat steps")
+        super().append(object)
 
     @staticmethod
     def cache_step(step_id):
@@ -31,27 +46,54 @@ class Steps:
             else:
                 return None
 
-    @staticmethod
-    def case_steps(request):
+    def get_steps(self) -> list:
+        """
+        From self ordered list of steps return theirs objects.
+        :param steps_ids: steps ids
+        :return: list of StepBody objects
+        """
+        ret_val = []
+        for step_id in self:
+            step_body = Steps.cache_step(step_id)
+            if step_body is not None:
+                ret_val.append(step_body)
+
+        return ret_val
+
+    def sort_case_steps(self, request):
         """
         Create sorted list of steps bound to case in rising order.
         :param request:
         :return:
         """
-        print(request)
-        ret_val = []
-        for data_step in request:
+        self.clear()
+        #  todo error with repeated step_id. use record id somehow
+
+        for step_id in range(len(request)):
+            data_step = request[step_id]
+            prev_step_id = str(data_step.get(CaseSteps.PREVIOUS_STEP_ID, 0))
             step_id = str(data_step.get(CaseSteps.STEP_ID, 0))
-            step_body = Steps.cache_step(step_id)
-            if step_body is not None:
-                ret_val.append(step_body)
-        return ret_val
+            # identify first step
+            if prev_step_id is None:
+                if len(self) == 0:
+                    self.append(step_id)
+                else:
+                    self.insert(0, step_id)
+            # regular step insert
+            else:
+                # find previous
+                if prev_step_id in self:
+                    self.insert(int(self.index(prev_step_id)) + 1, step_id)
+                else:
+                    self.append(step_id)
+                    # todo debug logger ("order {}".format(self))
+        return self.get_steps()
 
 
 if __name__ == '__main__':
-    connection = Database()
-
-    steps_order = connection.get_steps(1)
-    items = Steps.case_steps(steps_order)
-
+    com_switch.connection = Database()
+    steps = Steps()
+    steps_order = com_switch.connection.get_steps(3)
+    items = steps.sort_case_steps(steps_order)
+    print("order {}".format(steps))
     print("items {}".format(items))

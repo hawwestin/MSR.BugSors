@@ -8,6 +8,7 @@ from data_config import StepData
 from data_config import ad
 from data_config import atDict
 from data_config import ds
+from step_body import StepBody
 from step_instance import StepInstance
 from tk_scrolled_frame import VerticalScrolledFrame as ScrolledFrame
 from user import user
@@ -67,7 +68,8 @@ class CaseTab:
         if int(self.data.id) > 0:
             # self.new_comment = False
             self.dic_steps_gallery = {}
-            self.steps()
+            self.case_steps = Steps()
+            self.display_steps()
 
         self.update_comment = False
 
@@ -214,23 +216,21 @@ class CaseTab:
                                pady=_pady,
                                sticky='wn')
 
-    def steps(self):
+    def display_steps(self):
         """
         Reset current added steps and fetch from current connection new list.
         :return:
         """
-        # todo skasuj istniejące framy w label frame steps i wstaw ponownie.
         self.com_frame.destroy()
         self.com_frame = ScrolledFrame(self.com_frame_outline)
         self.com_frame.pack(anchor=tk.NW, fill=tk.BOTH, expand=True)
 
         steps_order = com_switch.connection.get_steps(self.data.id)
-        items = Steps.case_steps(steps_order)
+        items = self.case_steps.sort_case_steps(steps_order)
 
         if len(items) == 0:
             # todo statusbar
             return
-        # todo order by sequence. !!! previou next.
         for idx, data_step in enumerate(items):
             frame = tk.LabelFrame(self.com_frame.interior)
             frame.pack(fill=tk.BOTH, expand=True, anchor='nw')
@@ -277,21 +277,21 @@ class CaseTab:
         Send new step via current connection.
         :return:
         """
-        step = {StepData.APPLICANT: user.user_id,
-                StepData.IS_ACTIVE: 1,
-                StepData.CREATED_DT: datetime.datetime.now(),
-                StepData.DELATE_ID: self.data.id,
-                StepData.COMMENT: text,
-                StepData.ID: "0",
-                StepData.MODIFY_TIME: ""
+        step = {StepData.NAME: "some fioeld data ",
+                StepData.DESCRIPTION: text,
+                StepData.ASSEMBLY: 1,  # data from dict .
+                StepData.TYPE: 1,  # data from dict .
+                StepData.APPLICANT: user.user_id,
+                StepData.IS_ACTIVE: True,
                 }
 
-        response = com_switch.connection.post_step(step)
+        response = com_switch.connection.post_step(StepBody(step))
+        # todo bind it in current case if position was given
 
         if len(response) == 0:
             return 0
         else:
-            self.steps()
+            self.display_steps()
             return 1
 
     def control(self, disable=True):
