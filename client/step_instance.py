@@ -3,7 +3,7 @@ from tkinter.scrolledtext import ScrolledText
 
 from connection_module import com_switch
 from data_config import StepData
-from data_config import ad
+from data_config import dict_accounts
 from step_body import StepBody
 
 
@@ -37,7 +37,7 @@ class StepInstance(tk.Frame):
         l_ct = tk.Label(self, text="Utworzono\n{}".format(self.body.created_datetime))
         l_ct.grid(row=0, column=0)
 
-        l_aplicant = tk.Label(self, text="Autor\n{}".format(ad.get_name(str(self.body.applicant))))
+        l_aplicant = tk.Label(self, text="Autor\n{}".format(dict_accounts.get_name(str(self.body.applicant))))
         l_aplicant.grid(row=0, column=1)
 
         l_mt = tk.Label(self, text="Modyfikowany\n{}".format(self.body.modify_time))

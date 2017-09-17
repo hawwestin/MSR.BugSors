@@ -1,4 +1,4 @@
-from data_config import atDict
+from data_config import dict_account_type
 
 
 class User:
@@ -10,7 +10,7 @@ class User:
         self.__password = ""
         self.token = ""
         self.user_id = ""
-        self.user_type = atDict.guest
+        self.user_type = dict_account_type.guest
 
     @property
     def password(self):
@@ -27,6 +27,7 @@ class User:
         :param value:
         :return:
         """
+        # todo hash value password to store it in secure way
         self.__password = value
 
     def is_logged_in(self):

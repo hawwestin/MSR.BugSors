@@ -3,9 +3,9 @@ import socket
 import time
 
 from connection_module.connect_base import ConnectBase
-from data_config import CaseData
+from data_config import CaseData, BasicSHDict
 from data_config import StepData
-from data_config import atDict
+from data_config import dict_account_type
 from user import user
 
 
@@ -14,6 +14,11 @@ class ServerConnection(ConnectBase):
     todo read connection setting fromUI and set in innit.
     reset and change this value by Setters and getters methods.
     """
+
+    def get_dict(self, type: BasicSHDict):
+        request = {"method": "GET",
+                   "path": "/dictionaries/{}".format(type.TABLE)}
+        return self._read_data(json.dumps(request))
 
     def get_step(self, step_id):
         pass
@@ -129,12 +134,12 @@ class ServerConnection(ConnectBase):
                    "params": requestparams}
         return self._read_data(json.dumps(request))
 
-    def get_dict_states(self):
+    def get_dict_case_states(self):
         request = {"method": "GET",
                    "path": "/dictionaries/states"}
         return self._read_data(json.dumps(request))
 
-    def get_dict_acc_type(self):
+    def get_dict_account_type(self):
         request = {"method": "GET",
                    "path": "/dictionaries/accounttypes"}
         return self._read_data(json.dumps(request))
@@ -181,7 +186,7 @@ class ServerConnection(ConnectBase):
         requestparams = {CaseData.NAME: delate.name,
                          CaseData.DESCRIPTION: delate.description,
                          CaseData.STATUS: str(delate.status)}
-        if int(user.user_type) == int(atDict.admin) and str(delate.assigned) != "":
+        if int(user.user_type) == int(dict_account_type.admin) and str(delate.assigned) != "":
             requestparams[CaseData.ASSIGNED] = str(delate.assigned)
 
         request = {"method": "PUT",
@@ -199,7 +204,7 @@ class ServerConnection(ConnectBase):
                          CaseData.DESCRIPTION: delate.description,
                          CaseData.APPLICANT: str(user.user_id),
                          CaseData.STATUS: str(delate.status)}
-        if int(user.user_type) == int(atDict.admin) and str(delate.assigned) != "":
+        if int(user.user_type) == int(dict_account_type.admin) and str(delate.assigned) != "":
             requestparams[CaseData.ASSIGNED] = str(delate.assigned)
 
         request = {"method": "POST",
@@ -225,7 +230,7 @@ class ServerConnection(ConnectBase):
 
         return self._read_data(json.dumps(request))
 
-    def get_users(self):
+    def get_dict_users(self):
         request = {"method": "GET",
                    "path": "/users"}
         return self._read_data(json.dumps(request))

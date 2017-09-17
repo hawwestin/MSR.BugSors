@@ -64,6 +64,7 @@ class CaseSteps:
 class BasicSHDict:
     ID = 'id'
     NAME = 'name'
+    TABLE = ''
 
     def __init__(self):
         self._data = {}
@@ -112,6 +113,7 @@ class BasicSHDict:
 
 
 class Accounts(BasicSHDict):
+    TABLE = "sh.Users"
     ID = "id"
     NAME = "full_name"
     LOGIN = "login"
@@ -121,9 +123,12 @@ class Accounts(BasicSHDict):
     IS_ACTIVE = "is_active"
     EMAIL = "email"
 
+    put = [ID, NAME, LOGIN, Account_TYPE, PASSWORD, EMAIL]
+    post = [NAME, LOGIN, Account_TYPE, PASSWORD, EMAIL]
 
 # todo setup values according to server response
 class AccountType(BasicSHDict):
+    TABLE = 'sh.dict.AccountType'
     def __init__(self):
         self.__guest = 0
         self.developer = 1
@@ -140,29 +145,22 @@ class AccountType(BasicSHDict):
 
 
 class CaseStatus(BasicSHDict):
-    def __init__(self):
-        self.close_status = 5
-        super().__init__()
-
-    @property
-    def names_unclose(self):
-        """
-
-        :return:
-        """
-        return [self.data[idx] for idx in sorted(iter(self.data.keys())) if
-                str(idx) != str(self.close_status)]
+    TABLE = 'sh.dict.CaseStatus'
+    pass
 
 
 class CasePriority(BasicSHDict):
+    TABLE = 'sh.dict.Priority'
     pass
 
 
 class StepAssembly(BasicSHDict):
+    TABLE = 'sh.dict.StepAssembly'
     pass
 
 
 class StepType(BasicSHDict):
+    TABLE = 'sh.dict.StepType'
     pass
 
 
@@ -170,7 +168,9 @@ if __name__ == '__main__':
     mydict = {1: 'Otwarte', 2: 'Przypisane', 3: 'Rozwiązane'}
     print(list(mydict.keys())[list(mydict.values()).index('Przypisane')])
 else:
-    # todo rename this two letters crap
-    atDict = AccountType()
-    CS = CaseStatus()
-    ad = Accounts()
+    dict_account_type = AccountType()
+    dict_case_status = CaseStatus()
+    dict_accounts = Accounts()
+    dict_priority = CasePriority()
+    dict_step_assembly = StepAssembly()
+    dict_step_type = StepType()

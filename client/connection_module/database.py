@@ -3,7 +3,7 @@ import sqlite3
 import pathlib
 
 from connection_module.connect_base import ConnectBase
-from data_config import CaseData, CaseSteps, Accounts
+from data_config import CaseData, CaseSteps, Accounts, BasicSHDict
 from data_config import StepData
 from user import user
 
@@ -144,11 +144,17 @@ class Database(ConnectBase):
             raise
         return self._read_data(self.cursor.fetchall())[0]
 
-    def get_dict_states(self):
-
-        sql = ""
-        self.cursor.execute(sql)
-        self.connection.commit()
+    def get_dict(self, dict_type: BasicSHDict):
+        if dict_type.TABLE is None:
+            raise AttributeError("Table name unknown")
+        sql = """SELECT {}, {} FROM [{}]"""
+        sql = sql.format(dict_type.ID, dict_type.NAME, dict_type.TABLE)
+        print(sql)
+        try:
+            self.cursor.execute(sql)
+        except sqlite3.OperationalError:
+            raise
+        return self._read_data(self.cursor.fetchall())
 
     def post_case(self, case):
         sql = "INSERT INTO [sh.TestCase] ({0}) VALUES ({1});"
@@ -199,16 +205,6 @@ class Database(ConnectBase):
 
     def get_case(self):
         sql = """SELECT * FROM [sh.TestCase]"""
-        print(sql)
-        try:
-            self.cursor.execute(sql)
-        except sqlite3.OperationalError:
-            raise
-        return self._read_data(self.cursor.fetchall())
-
-    def get_users(self):
-        sql = """SELECT {}, {} FROM [sh.Users]"""
-        sql = sql.format(Accounts.ID, Accounts.NAME)
         print(sql)
         try:
             self.cursor.execute(sql)

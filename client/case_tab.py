@@ -2,12 +2,12 @@ import datetime
 import tkinter as tk
 from tkinter import ttk
 
-from case import case_collection
+from client.case import case_collection
 from connection_module import com_switch
 from data_config import StepData
-from data_config import ad
-from data_config import atDict
-from data_config import CS
+from data_config import dict_accounts
+from data_config import dict_account_type
+from data_config import dict_case_status
 from step_body import StepBody
 from step_instance import StepInstance
 from tk_scrolled_frame import VerticalScrolledFrame as ScrolledFrame
@@ -146,7 +146,7 @@ class CaseTab:
                                padx=_padx)
 
         self.lApplicant = ttk.Label(self.entry_space,
-                                    text="Zgłaszający\n{}".format(ad.get_name(str(self.data.applicant))),
+                                    text="Zgłaszający\n{}".format(dict_accounts.get_name(str(self.data.applicant))),
                                     justify=tk.CENTER)
         self.lApplicant.grid(row=labelRow,
                              column=2,
@@ -160,7 +160,7 @@ class CaseTab:
                                padx=_padx)
 
         self.lModify_by = ttk.Label(self.entry_space,
-                                    text="Modifikowany przez\n{}".format(ad.get_name(str(self.data.modify_by))),
+                                    text="Modifikowany przez\n{}".format(dict_accounts.get_name(str(self.data.modify_by))),
                                     justify=tk.CENTER)
         self.lModify_by.grid(row=labelRow,
                              column=4,
@@ -172,12 +172,12 @@ class CaseTab:
                       padx=_padx,
                       pady=_pady)
 
-        if str(self.data.status) == str(CS.close_status) or user.user_type == atDict.admin:
-            self.cbStatus.configure(value=CS.names)
+        if str(self.data.status) == str(dict_case_status.close_status) or user.user_type == dict_account_type.admin:
+            self.cbStatus.configure(value=dict_case_status.names)
         else:
-            self.cbStatus.configure(value=CS.names_unclose)
+            self.cbStatus.configure(value=dict_case_status.names_unclose)
 
-        self.cbStatus.set(CS.get_name(self.data.status))
+        self.cbStatus.set(dict_case_status.get_name(self.data.status))
         self.cbStatus.grid(row=1,
                            column=1,
                            padx=_padx,
@@ -189,8 +189,8 @@ class CaseTab:
                         padx=_padx,
                         pady=_pady)
 
-        self.cbAssigned.configure(value=ad.names)
-        self.cbAssigned.set(ad.get_name(self.data.assigned))
+        self.cbAssigned.configure(value=dict_accounts.names)
+        self.cbAssigned.set(dict_accounts.get_name(self.data.assigned))
         self.cbAssigned.grid(row=1,
                              column=4,
                              padx=_padx,
@@ -307,7 +307,7 @@ class CaseTab:
             cb_state = "readonly"
         self.tDescription.configure(state=state)
         self.eName.configure(state=state)
-        if user.user_type == atDict.admin:
+        if user.user_type == dict_account_type.admin:
             self.cbAssigned.configure(state=cb_state)
         else:
             self.cbAssigned.configure(state=tk.DISABLED)
@@ -329,9 +329,9 @@ class CaseTab:
         """
         self.data.description = self.tDescription.get("1.0", 'end-1c')
         self.data.name = self.eName.get("1.0", 'end-1c')
-        self.data.status = CS.index(self.cbStatus.get())
-        if int(user.user_type) == int(atDict.admin):
-            self.data.assigned = ad.index(self.cbAssigned.get())
+        self.data.status = dict_case_status.index(self.cbStatus.get())
+        if int(user.user_type) == int(dict_account_type.admin):
+            self.data.assigned = dict_accounts.index(self.cbAssigned.get())
 
         if case_collection.send_new_delate(self.data):
             self.main_window.navigator.populate_delate_list()
@@ -348,20 +348,20 @@ class CaseTab:
         zbierz dane z inputów i przeslij do serwera.
         :return:
         """
-        if str(self.data.status) != str(CS.index(self.cbStatus.get())):
+        if str(self.data.status) != str(dict_case_status.index(self.cbStatus.get())):
             if self.update_comment:
                 self.update_comment = False
             else:
                 self.add_step_popup(
-                    "Zmiana statusu {} -> {}".format(CS.get_name(self.data.status), self.cbStatus.get()))
+                    "Zmiana statusu {} -> {}".format(dict_case_status.get_name(self.data.status), self.cbStatus.get()))
                 return
 
         self.data.description = self.tDescription.get("1.0", 'end-1c')
         name_change = (self.data.name != self.eName.get("1.0", 'end-1c'))
         if name_change:
             self.data.name = self.eName.get("1.0", 'end-1c')
-        self.data.assigned = ad.index(self.cbAssigned.get())
-        self.data.status = CS.index(self.cbStatus.get())
+        self.data.assigned = dict_accounts.index(self.cbAssigned.get())
+        self.data.status = dict_case_status.index(self.cbStatus.get())
 
         if case_collection.save_case(self.data):
             self.main_window.navigator.populate_delate_list()
@@ -392,9 +392,9 @@ class CaseTab:
 
         self.eName.insert('1.0', self.data.name)
         self.tDescription.insert('1.0', self.data.description)
-        self.cbStatus.set(CS.get_name(self.data.status))
+        self.cbStatus.set(dict_case_status.get_name(self.data.status))
         self.lModify_time.configure(text="Zmodyfikowano\n{}".format(str(self.data.modify_time)))
-        self.lModify_by.configure(text="Modifikowany przez\n{}".format(ad.get_name(str(self.data.modify_by))))
+        self.lModify_by.configure(text="Modifikowany przez\n{}".format(dict_accounts.get_name(str(self.data.modify_by))))
 
         if self.data.id != 0:
             self.control(True)

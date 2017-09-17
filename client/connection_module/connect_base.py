@@ -1,11 +1,14 @@
 import abc
 
+from data_config import BasicSHDict
+
 
 class ConnectBase(metaclass=abc.ABCMeta):
     """
     Base class for connection to remote server and to local database.
 
     """
+
     @classmethod
     def __subclasshook__(cls, C):
         if cls is ConnectBase:
@@ -26,7 +29,7 @@ class ConnectBase(metaclass=abc.ABCMeta):
         pass
 
     @abc.abstractmethod
-    def get_dict_states(self):
+    def get_dict(self, type: BasicSHDict):
         pass
 
     @abc.abstractmethod
@@ -97,10 +100,6 @@ class ConnectBase(metaclass=abc.ABCMeta):
         :param step:
         :return:
         """
-        pass
-
-    @abc.abstractmethod
-    def get_users(self):
         pass
 
     @abc.abstractmethod
