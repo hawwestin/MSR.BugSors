@@ -1,10 +1,10 @@
 import tkinter as tk
 from tkinter.scrolledtext import ScrolledText
 
-from connection_module import com_switch
-from data_config import StepData
-from data_config import dict_accounts
-from step_body import StepBody
+from client.connection_module import com_switch
+from client.data_config import StepData
+from client.data_config import dict_accounts
+from client.step_body import StepBody
 
 
 class StepInstance(tk.Frame):

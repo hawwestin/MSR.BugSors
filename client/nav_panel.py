@@ -2,15 +2,8 @@ import tkinter as tk
 from tkinter import font
 from tkinter import ttk
 
-from data_config import CaseData
-from data_config import StepData
-from utils import populate_constants
-from case import case_collection
-from settings_window import Settings
-from user import user
-
-DC = CaseData()
-DCOM = StepData()
+from client.data_config import CaseData
+from client.case import case_collection
 
 
 class NavPanel(tk.Frame):
@@ -43,7 +36,8 @@ class NavPanel(tk.Frame):
         Tk widgets inside navigation frame.
         :return:
         """
-        B1 = ttk.Button(self.menurow, text="Połącz", command=self.main_window.menu_command.establish_connection)
+        B1 = ttk.Button(self.menurow, name="connect", text="Połącz",
+                        command=self.main_window.menu_command.establish_connection)
         B1.grid(row=0, column=0, sticky=tk.N + tk.S + tk.E + tk.W)
         # B2 = ttk.Button(self.menurow, text="szukaj")
         # B2.grid(row=0, column=1, sticky=tk.N + tk.S + tk.E + tk.W)
@@ -66,12 +60,13 @@ class NavPanel(tk.Frame):
         """
         self.dlist.delete(0, tk.END)
         # todo remake formatting in customizable panned table .
-        self.dlist.insert(tk.END, "{:<5s} {:<15s}".format(DC.ID, DC.NAME))
+        self.dlist.insert(tk.END, "{:<5s} {:<15s}".format(CaseData.ID, CaseData.NAME))
         for row in sorted(case_collection.delateList):
             self.dlist.insert(tk.END, self.format_name(case_collection.delateDict[row].id,
                                                        case_collection.delateDict[row].name))
             # Zbudowanie slownika łączącego numer wiersza z wpisanym do niego Delate id
             self.dList_gallery[self.dlist.get(tk.END)] = case_collection.delateDict[row].id
+        return None
 
     def format_name(self, idx, name):
         """

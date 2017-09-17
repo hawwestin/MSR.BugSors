@@ -1,6 +1,7 @@
-from data_config import CaseData
+from client.data_config import CaseData
 
 
+# todo rename na body
 class CaseInstance:
     def __init__(self, value: dict):
         # todo remake to kwargs

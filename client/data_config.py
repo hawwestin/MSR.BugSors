@@ -126,9 +126,11 @@ class Accounts(BasicSHDict):
     put = [ID, NAME, LOGIN, Account_TYPE, PASSWORD, EMAIL]
     post = [NAME, LOGIN, Account_TYPE, PASSWORD, EMAIL]
 
+
 # todo setup values according to server response
 class AccountType(BasicSHDict):
     TABLE = 'sh.dict.AccountType'
+
     def __init__(self):
         self.__guest = 0
         self.developer = 1

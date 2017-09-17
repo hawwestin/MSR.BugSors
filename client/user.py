@@ -1,4 +1,4 @@
-from data_config import dict_account_type
+from client.data_config import dict_account_type
 
 
 class User:

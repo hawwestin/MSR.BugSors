@@ -1,9 +1,9 @@
 import tkinter as tk
 
-from connection_module import com_switch
-from data_config import Accounts
-from user import user
-from utils import populate_constants
+from client.connection_module import com_switch
+from client.data_config import Accounts
+from client.user import user
+from client.utils import populate_constants
 
 
 class Settings(tk.Toplevel):

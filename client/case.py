@@ -1,10 +1,9 @@
 import datetime
 
-from case_body import CaseInstance
-from connection_module import com_switch
-from data_config import CaseData
-from data_config import StepData
-from user import user
+from client.case_body import CaseInstance
+from client.connection_module import com_switch
+from client.data_config import CaseData
+from client.user import user
 
 """
 Container to hold composition of CasInstances.
@@ -42,7 +41,7 @@ class Case:
         self.__insert_delate_to_dict_collection(chunk)
         return self.delateDict.get(0)
 
-    def get_case(self, idx=None):
+    def fetch_case(self, idx=None):
         """
         Decode data from serwer to case that can by disposed in Class and stored in dict _delates.List.
         :param idx: pobranie wpisu z bazy o konkretnym id.
@@ -96,7 +95,7 @@ class Case:
             return 1
         else:
             return 0
-            # return self.get_case(ret[0].get(DD.ID, 0))
+            # return self.fetch_case(ret[0].get(DD.ID, 0))
 
     def save_case(self, case: CaseInstance):
         """
@@ -105,7 +104,7 @@ class Case:
         :return: 
         """
         com_switch.connection.put_case(case)
-        return self.get_case(case.id)
+        return self.fetch_case(case.id)
 
 
 if __name__ == '__main__':

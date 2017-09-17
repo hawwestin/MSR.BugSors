@@ -2,10 +2,10 @@ import os.path
 import sqlite3
 import pathlib
 
-from connection_module.connect_base import ConnectBase
-from data_config import CaseData, CaseSteps, Accounts, BasicSHDict
-from data_config import StepData
-from user import user
+from client.connection_module.connect_base import ConnectBase
+from client.data_config import CaseData, CaseSteps, Accounts, BasicSHDict
+from client.data_config import StepData
+from client.user import user
 
 
 class Database(ConnectBase):

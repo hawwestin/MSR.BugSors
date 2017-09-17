@@ -26,8 +26,8 @@ class MainMenu:
 
         file.add_command(label="New", command=self.menu_command.add_case)
         # file.add_cascade(label="Open connection", menu=open)
-        file.add_command(label="Open connection", command=self.menu_command.settings)
-        file.add_command(label="Reload")
+        file.add_command(label="Settings", command=self.menu_command.settings)
+        file.add_command(label="Reload", command=self.menu_command.establish_connection)
         file.add_separator()
         file.add_command(label="Exit", command=self.menu_command.client_exit)
         self.menu.add_cascade(label="File", menu=file)

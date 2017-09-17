@@ -2,17 +2,18 @@ import datetime
 import tkinter as tk
 from tkinter import ttk
 
+from client.case_body import CaseInstance
 from client.case import case_collection
-from connection_module import com_switch
-from data_config import StepData
-from data_config import dict_accounts
-from data_config import dict_account_type
-from data_config import dict_case_status
-from step_body import StepBody
-from step_instance import StepInstance
-from tk_scrolled_frame import VerticalScrolledFrame as ScrolledFrame
-from user import user
-from steps import Steps
+from client.connection_module import com_switch
+from client.data_config import StepData
+from client.data_config import dict_accounts
+from client.data_config import dict_account_type
+from client.data_config import dict_case_status
+from client.step_body import StepBody
+from client.step_instance import StepInstance
+from client.tk_scrolled_frame import VerticalScrolledFrame as ScrolledFrame
+from client.user import user
+from client.steps import Steps
 
 
 class CaseTab:
@@ -20,7 +21,7 @@ class CaseTab:
     Notebook tab tkinter body that holds all widgets and aggregate data.
     """
 
-    def __init__(self, main_window, parentFrame, case_instance):
+    def __init__(self, main_window, parentFrame, case_instance: CaseInstance):
         self.main_window = main_window
         self.parent_frame = parentFrame
         self.data = case_instance
@@ -52,7 +53,7 @@ class CaseTab:
         self.lId = tk.Label(self.entry_space)
         self.eName = tk.Entry(self.entry_space)
         self.lApplicant = tk.Label(self.entry_space)
-        self.cbAssigned = ttk.Combobox(self.entry_space)
+
         self.cbStatus = ttk.Combobox(self.entry_space)
         self.lCreate_time = tk.Label(self.entry_space)
         self.lModify_time = tk.Label(self.entry_space)
@@ -172,7 +173,8 @@ class CaseTab:
                       padx=_padx,
                       pady=_pady)
 
-        if str(self.data.status) == str(dict_case_status.close_status) or user.user_type == dict_account_type.admin:
+        # if str(self.data.status) == str(dict_case_status.close_status) or user.user_type == dict_account_type.admin:
+        if user.user_type == dict_account_type.admin:
             self.cbStatus.configure(value=dict_case_status.names)
         else:
             self.cbStatus.configure(value=dict_case_status.names_unclose)
@@ -188,13 +190,6 @@ class CaseTab:
                         column=3,
                         padx=_padx,
                         pady=_pady)
-
-        self.cbAssigned.configure(value=dict_accounts.names)
-        self.cbAssigned.set(dict_accounts.get_name(self.data.assigned))
-        self.cbAssigned.grid(row=1,
-                             column=4,
-                             padx=_padx,
-                             pady=_pady)
 
         self.eName = tk.Text(self.entry_space,
                              wrap=tk.WORD,
@@ -307,10 +302,6 @@ class CaseTab:
             cb_state = "readonly"
         self.tDescription.configure(state=state)
         self.eName.configure(state=state)
-        if user.user_type == dict_account_type.admin:
-            self.cbAssigned.configure(state=cb_state)
-        else:
-            self.cbAssigned.configure(state=tk.DISABLED)
         self.cbStatus.configure(state=cb_state)
         self.bAktualizuj.configure(state=state)
 
@@ -330,8 +321,6 @@ class CaseTab:
         self.data.description = self.tDescription.get("1.0", 'end-1c')
         self.data.name = self.eName.get("1.0", 'end-1c')
         self.data.status = dict_case_status.index(self.cbStatus.get())
-        if int(user.user_type) == int(dict_account_type.admin):
-            self.data.assigned = dict_accounts.index(self.cbAssigned.get())
 
         if case_collection.send_new_delate(self.data):
             self.main_window.navigator.populate_delate_list()
@@ -360,7 +349,6 @@ class CaseTab:
         name_change = (self.data.name != self.eName.get("1.0", 'end-1c'))
         if name_change:
             self.data.name = self.eName.get("1.0", 'end-1c')
-        self.data.assigned = dict_accounts.index(self.cbAssigned.get())
         self.data.status = dict_case_status.index(self.cbStatus.get())
 
         if case_collection.save_case(self.data):

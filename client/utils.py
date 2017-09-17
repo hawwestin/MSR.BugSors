@@ -1,10 +1,10 @@
-from connection_module import com_switch
-from data_config import dict_accounts
-from data_config import dict_account_type
-from data_config import dict_case_status
-from data_config import dict_priority
-from data_config import dict_step_assembly
-from data_config import dict_step_type
+from client.connection_module import com_switch
+from client.data_config import dict_accounts
+from client.data_config import dict_account_type
+from client.data_config import dict_case_status
+from client.data_config import dict_priority
+from client.data_config import dict_step_assembly
+from client.data_config import dict_step_type
 
 '''
 tk.StringVar()

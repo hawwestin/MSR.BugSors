@@ -2,10 +2,10 @@
 import tkinter as tk
 from tkinter import ttk
 
-from user import user
-from settings_window import Settings
-from utils import populate_constants
-from case import case_collection
+from client.user import user
+from client.settings_window import Settings
+from client.utils import populate_constants
+from client.case import case_collection
 
 
 class MenuCmd:
@@ -70,5 +70,5 @@ class MenuCmd:
         :return:
         """
         populate_constants()
-        case_collection.get_case()
+        case_collection.fetch_case()
         self.main_window.navigator.populate_delate_list()

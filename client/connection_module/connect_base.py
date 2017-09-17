@@ -1,6 +1,6 @@
 import abc
 
-from data_config import BasicSHDict
+from client.data_config import BasicSHDict
 
 
 class ConnectBase(metaclass=abc.ABCMeta):

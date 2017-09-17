@@ -2,11 +2,11 @@ import json
 import socket
 import time
 
-from connection_module.connect_base import ConnectBase
-from data_config import CaseData, BasicSHDict
-from data_config import StepData
-from data_config import dict_account_type
-from user import user
+from client.connection_module.connect_base import ConnectBase
+from client.data_config import CaseData, BasicSHDict
+from client.data_config import StepData
+from client.data_config import dict_account_type
+from client.user import user
 
 
 class ServerConnection(ConnectBase):

@@ -3,14 +3,14 @@ import json
 import tkinter as tk
 from tkinter import ttk
 
-import client.case_tab as delate_tab
 import client.utils as utils
-from case_tab import CaseTab
+from client.case_tab import CaseTab
 from client.case import case_collection
 from client.menu_bar import *
 from client.nav_panel import NavPanel
-import connection_module
-from menu_command import MenuCmd
+from client.connection_module import com_switch
+from client.connection_module import Database
+from client.menu_command import MenuCmd
 
 
 class Window(tk.Tk):
@@ -31,7 +31,7 @@ class Window(tk.Tk):
         self.containerBody.pack(fill=tk.BOTH, expand=True)
 
         # switch of connection !
-        connection_module.com_switch.connection = connection_module.Database(adres="../db/test_local.db")
+        com_switch.connection = Database(adres="../db/test_local.db")
 
         self.menu_command = MenuCmd(self)
         self.main_menu = MainMenu(self)
@@ -97,17 +97,17 @@ class Window(tk.Tk):
                     self.tab_gallery[name].data = case_collection.create_case_locally()
                 return None
 
-        frame = ttk.Frame(self.notebook)
+        frame = ttk.Frame(master=self.notebook, name=str(del_id))
         frame.pack(fill=BOTH, expand=1)
         # todo dodawany jest podwójnie raz jako id 0 na liscie a raz pod id pobranym z serwera.
         if del_id > 0:
             if case_collection.delateDict.get(del_id, 0) != 0:
-                self.tab_gallery[name] = delate_tab.CaseTab(self, frame, case_collection.delateDict.get(del_id))
-            # else:
-            #     print(json.dumps(case_collection.delateDict))
+                self.tab_gallery[name] = CaseTab(self, frame, case_collection.delateDict.get(del_id))
+            else:
+                print(json.dumps(case_collection.delateDict))
 
         else:
-            self.tab_gallery[name] = delate_tab.CaseTab(self, frame, case_collection.create_case_locally())
+            self.tab_gallery[name] = CaseTab(self, frame, case_collection.create_case_locally())
         self.notebook.add(frame, text=name)
         self.notebook.select(self.notebook.index(tk.END) - 1)
 

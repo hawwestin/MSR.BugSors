@@ -1,8 +1,8 @@
 from collections import UserList
 
 from client.step_body import StepBody
-from connection_module import com_switch, Database
-from data_config import CaseSteps, StepData
+from client.connection_module import com_switch, Database
+from client.data_config import CaseSteps, StepData
 
 
 class Steps(list):
@@ -69,8 +69,8 @@ class Steps(list):
         self.clear()
         #  todo error with repeated step_id. use record id somehow
 
-        for step_id in range(len(request)):
-            data_step = request[step_id]
+        for row in range(len(request)):
+            data_step = request[row]
             prev_step_id = str(data_step.get(CaseSteps.PREVIOUS_STEP_ID, 0))
             step_id = str(data_step.get(CaseSteps.STEP_ID, 0))
             # identify first step
