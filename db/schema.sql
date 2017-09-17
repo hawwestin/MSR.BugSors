@@ -1,12 +1,14 @@
 --
--- File generated with SQLiteStudio v3.1.1 on So wrz 9 23:15:15 2017
+-- File generated with SQLiteStudio v3.1.1 on N wrz 17 16:41:32 2017
 --
--- Text encoding used: System
+-- Text encoding used: UTF-8
 --
 PRAGMA foreign_keys = off;
 BEGIN TRANSACTION;
 
 -- Table: sh.CaseSteps
+DROP TABLE IF EXISTS [sh.CaseSteps];
+
 CREATE TABLE [sh.CaseSteps] (
     id               INTEGER PRIMARY KEY AUTOINCREMENT,
     case_id          INTEGER REFERENCES [sh.TestCase] (id) MATCH [FULL]
@@ -17,7 +19,48 @@ CREATE TABLE [sh.CaseSteps] (
 );
 
 
+-- Table: sh.dict.AccountType
+DROP TABLE IF EXISTS [sh.dict.AccountType];
+
+CREATE TABLE [sh.dict.AccountType] (
+    id   INTEGER PRIMARY KEY AUTOINCREMENT
+                 NOT NULL
+                 UNIQUE,
+    name TEXT    UNIQUE
+                 NOT NULL
+);
+
+INSERT INTO [sh.dict.AccountType] (
+                                      id,
+                                      name
+                                  )
+                                  VALUES (
+                                      1,
+                                      'guest'
+                                  );
+
+INSERT INTO [sh.dict.AccountType] (
+                                      id,
+                                      name
+                                  )
+                                  VALUES (
+                                      2,
+                                      'developer'
+                                  );
+
+INSERT INTO [sh.dict.AccountType] (
+                                      id,
+                                      name
+                                  )
+                                  VALUES (
+                                      3,
+                                      'admin'
+                                  );
+
+
 -- Table: sh.dict.CaseStatus
+DROP TABLE IF EXISTS [sh.dict.CaseStatus];
+
 CREATE TABLE [sh.dict.CaseStatus] (
     id   INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT
@@ -43,6 +86,8 @@ INSERT INTO [sh.dict.CaseStatus] (
 
 
 -- Table: sh.dict.Priority
+DROP TABLE IF EXISTS [sh.dict.Priority];
+
 CREATE TABLE [sh.dict.Priority] (
     id   INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT
@@ -77,6 +122,8 @@ INSERT INTO [sh.dict.Priority] (
 
 
 -- Table: sh.dict.StepAssembly
+DROP TABLE IF EXISTS [sh.dict.StepAssembly];
+
 CREATE TABLE [sh.dict.StepAssembly] (
     id   INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT
@@ -111,6 +158,8 @@ INSERT INTO [sh.dict.StepAssembly] (
 
 
 -- Table: sh.dict.StepType
+DROP TABLE IF EXISTS [sh.dict.StepType];
+
 CREATE TABLE [sh.dict.StepType] (
     id   INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT    NOT NULL
@@ -136,6 +185,8 @@ INSERT INTO [sh.dict.StepType] (
 
 
 -- Table: sh.Step
+DROP TABLE IF EXISTS [sh.Step];
+
 CREATE TABLE [sh.Step] (
     id          INTEGER  PRIMARY KEY AUTOINCREMENT,
     name        TEXT     NOT NULL,
@@ -147,16 +198,19 @@ CREATE TABLE [sh.Step] (
     modify_time DATETIME,
     modify_by   INTEGER  REFERENCES [sh.Users] (id) MATCH [FULL],
     is_active   INTEGER  NOT NULL
-                         DEFAULT (1) 
+                         DEFAULT true
 );
 
 
 -- Table: sh.TestCase
+DROP TABLE IF EXISTS [sh.TestCase];
+
 CREATE TABLE [sh.TestCase] (
-    id               INTEGER  PRIMARY KEY,
+    id               INTEGER  PRIMARY KEY AUTOINCREMENT
+                              NOT NULL,
     name             TEXT     NOT NULL,
     description      TEXT,
-    status           INTEGER  REFERENCES [sh.dict.case_status] (id) MATCH [FULL],
+    status           INTEGER  REFERENCES [sh.dict.CaseStatus] (id) MATCH [FULL],
     priority         INTEGER  REFERENCES [sh.dict.priority] (id) MATCH [FULL],
     objective        TEXT,
     expected_results TEXT,
@@ -171,6 +225,8 @@ CREATE TABLE [sh.TestCase] (
 
 
 -- Table: sh.Users
+DROP TABLE IF EXISTS [sh.Users];
+
 CREATE TABLE [sh.Users] (
     id               INTEGER  PRIMARY KEY ASC AUTOINCREMENT
                               UNIQUE
@@ -178,8 +234,7 @@ CREATE TABLE [sh.Users] (
     full_name        TEXT,
     login            TEXT     UNIQUE
                               NOT NULL,
-    account_type     INTEGER  REFERENCES [sh.dict.AccountType] (id) MATCH [FULL]
-                              DEFAULT (1) 
+    account_type     INTEGER  DEFAULT (1) 
                               NOT NULL,
     notification     INTEGER  NOT NULL
                               DEFAULT (1),
@@ -191,6 +246,81 @@ CREATE TABLE [sh.Users] (
     token            TEXT,
     email            TEXT
 );
+
+INSERT INTO [sh.Users] (
+                           id,
+                           full_name,
+                           login,
+                           account_type,
+                           notification,
+                           created_datetime,
+                           is_active,
+                           password,
+                           token,
+                           email
+                       )
+                       VALUES (
+                           1,
+                           'guest',
+                           'guest',
+                           1,
+                           1,
+                           '2017-09-17 16:40:06',
+                           1,
+                           'guest',
+                           NULL,
+                           NULL
+                       );
+
+INSERT INTO [sh.Users] (
+                           id,
+                           full_name,
+                           login,
+                           account_type,
+                           notification,
+                           created_datetime,
+                           is_active,
+                           password,
+                           token,
+                           email
+                       )
+                       VALUES (
+                           2,
+                           'devel',
+                           'devel',
+                           2,
+                           1,
+                           '2017-09-12 22:28:05',
+                           1,
+                           'devel',
+                           NULL,
+                           NULL
+                       );
+
+INSERT INTO [sh.Users] (
+                           id,
+                           full_name,
+                           login,
+                           account_type,
+                           notification,
+                           created_datetime,
+                           is_active,
+                           password,
+                           token,
+                           email
+                       )
+                       VALUES (
+                           3,
+                           'admin',
+                           'admin',
+                           3,
+                           1,
+                           '2017-09-17 16:39:39',
+                           1,
+                           'admin',
+                           NULL,
+                           NULL
+                       );
 
 
 COMMIT TRANSACTION;
