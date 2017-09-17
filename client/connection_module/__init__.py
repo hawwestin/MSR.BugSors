@@ -8,7 +8,7 @@ class Connection:
         self.__connection = None
 
     @property
-    def connection(self):
+    def connection(self) -> ConnectBase:
         return self.__connection
 
     @connection.setter

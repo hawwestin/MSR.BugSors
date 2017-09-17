@@ -37,7 +37,7 @@ class StepInstance(tk.Frame):
         l_ct = tk.Label(self, text="Utworzono\n{}".format(self.body.created_datetime))
         l_ct.grid(row=0, column=0)
 
-        l_aplicant = tk.Label(self, text="Autor\n{}".format(ad.user_name(str(self.body.applicant))))
+        l_aplicant = tk.Label(self, text="Autor\n{}".format(ad.get_name(str(self.body.applicant))))
         l_aplicant.grid(row=0, column=1)
 
         l_mt = tk.Label(self, text="Modyfikowany\n{}".format(self.body.modify_time))

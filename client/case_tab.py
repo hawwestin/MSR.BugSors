@@ -7,7 +7,7 @@ from connection_module import com_switch
 from data_config import StepData
 from data_config import ad
 from data_config import atDict
-from data_config import ds
+from data_config import CS
 from step_body import StepBody
 from step_instance import StepInstance
 from tk_scrolled_frame import VerticalScrolledFrame as ScrolledFrame
@@ -146,7 +146,7 @@ class CaseTab:
                                padx=_padx)
 
         self.lApplicant = ttk.Label(self.entry_space,
-                                    text="Zgłaszający\n{}".format(ad.user_name(str(self.data.applicant))),
+                                    text="Zgłaszający\n{}".format(ad.get_name(str(self.data.applicant))),
                                     justify=tk.CENTER)
         self.lApplicant.grid(row=labelRow,
                              column=2,
@@ -160,7 +160,7 @@ class CaseTab:
                                padx=_padx)
 
         self.lModify_by = ttk.Label(self.entry_space,
-                                    text="Modifikowany przez\n{}".format(ad.user_name(str(self.data.modify_by))),
+                                    text="Modifikowany przez\n{}".format(ad.get_name(str(self.data.modify_by))),
                                     justify=tk.CENTER)
         self.lModify_by.grid(row=labelRow,
                              column=4,
@@ -172,12 +172,12 @@ class CaseTab:
                       padx=_padx,
                       pady=_pady)
 
-        if str(self.data.status) == str(ds.close_status) or user.user_type == atDict.admin:
-            self.cbStatus.configure(value=ds.names)
+        if str(self.data.status) == str(CS.close_status) or user.user_type == atDict.admin:
+            self.cbStatus.configure(value=CS.names)
         else:
-            self.cbStatus.configure(value=ds.names_unclose)
+            self.cbStatus.configure(value=CS.names_unclose)
 
-        self.cbStatus.set(ds.state_name(self.data.status))
+        self.cbStatus.set(CS.get_name(self.data.status))
         self.cbStatus.grid(row=1,
                            column=1,
                            padx=_padx,
@@ -190,7 +190,7 @@ class CaseTab:
                         pady=_pady)
 
         self.cbAssigned.configure(value=ad.names)
-        self.cbAssigned.set(ad.user_name(self.data.assigned))
+        self.cbAssigned.set(ad.get_name(self.data.assigned))
         self.cbAssigned.grid(row=1,
                              column=4,
                              padx=_padx,
@@ -236,25 +236,25 @@ class CaseTab:
             frame.pack(fill=tk.BOTH, expand=True, anchor='nw')
             self.dic_steps_gallery[idx] = StepInstance(frame, data_step)
 
-    def add_step_popup(self, title=""):
+    def add_step_popup(self, name=""):
         """
         Display new window with entries to add new step.
-        :param title:
+        :param name:
         :return:
         """
         default_msg = "Nowy krok"
-        if title == "":
+        if name == "":
             text = default_msg
         else:
-            text = title
+            text = name
 
         def save():
-            if title != "":  # porównanie czy jest to Updatowy komentarz. jak będzie więcej porównać z listą .
-                com = "{}\n{}".format(title, e_text.get("1.0", 'end-1c'))
+            if name != "":  # porównanie czy jest to Updatowy komentarz. jak będzie więcej porównać z listą .
+                description = "{}\n{}".format(name, e_text.get("1.0", 'end-1c'))
                 self.update_comment = True
             else:
-                com = e_text.get("1.0", 'end-1c')
-            if self.add_step(com) == 1:
+                description = e_text.get("1.0", 'end-1c')
+            if self.save_step(description) == 1:
                 self.update()
             popup.destroy()
 
@@ -272,7 +272,7 @@ class CaseTab:
 
         popup.mainloop()
 
-    def add_step(self, text):
+    def save_step(self, text):
         """
         Send new step via current connection.
         :return:
@@ -329,9 +329,9 @@ class CaseTab:
         """
         self.data.description = self.tDescription.get("1.0", 'end-1c')
         self.data.name = self.eName.get("1.0", 'end-1c')
-        self.data.status = ds.state_idx(self.cbStatus.get())
+        self.data.status = CS.index(self.cbStatus.get())
         if int(user.user_type) == int(atDict.admin):
-            self.data.assigned = ad.user_idx(self.cbAssigned.get())
+            self.data.assigned = ad.index(self.cbAssigned.get())
 
         if case_collection.send_new_delate(self.data):
             self.main_window.navigator.populate_delate_list()
@@ -348,20 +348,20 @@ class CaseTab:
         zbierz dane z inputów i przeslij do serwera.
         :return:
         """
-        if str(self.data.status) != str(ds.state_idx(self.cbStatus.get())):
+        if str(self.data.status) != str(CS.index(self.cbStatus.get())):
             if self.update_comment:
                 self.update_comment = False
             else:
                 self.add_step_popup(
-                    "Zmiana statusu {} -> {}".format(ds.state_name(self.data.status), self.cbStatus.get()))
+                    "Zmiana statusu {} -> {}".format(CS.get_name(self.data.status), self.cbStatus.get()))
                 return
 
         self.data.description = self.tDescription.get("1.0", 'end-1c')
         name_change = (self.data.name != self.eName.get("1.0", 'end-1c'))
         if name_change:
             self.data.name = self.eName.get("1.0", 'end-1c')
-        self.data.assigned = ad.user_idx(self.cbAssigned.get())
-        self.data.status = ds.state_idx(self.cbStatus.get())
+        self.data.assigned = ad.index(self.cbAssigned.get())
+        self.data.status = CS.index(self.cbStatus.get())
 
         if case_collection.save_case(self.data):
             self.main_window.navigator.populate_delate_list()
@@ -392,9 +392,9 @@ class CaseTab:
 
         self.eName.insert('1.0', self.data.name)
         self.tDescription.insert('1.0', self.data.description)
-        self.cbStatus.set(ds.state_name(self.data.status))
+        self.cbStatus.set(CS.get_name(self.data.status))
         self.lModify_time.configure(text="Zmodyfikowano\n{}".format(str(self.data.modify_time)))
-        self.lModify_by.configure(text="Modifikowany przez\n{}".format(ad.user_name(str(self.data.modify_by))))
+        self.lModify_by.configure(text="Modifikowany przez\n{}".format(ad.get_name(str(self.data.modify_by))))
 
         if self.data.id != 0:
             self.control(True)
