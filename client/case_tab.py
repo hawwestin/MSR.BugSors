@@ -9,6 +9,7 @@ from client.data_config import StepData
 from client.data_config import dict_accounts
 from client.data_config import dict_account_type
 from client.data_config import dict_case_status
+from client.data_config import dict_priority
 from client.step_body import StepBody
 from client.step_instance import StepInstance
 from client.tk_scrolled_frame import VerticalScrolledFrame as ScrolledFrame
@@ -20,6 +21,8 @@ class CaseTab:
     """
     Notebook tab tkinter body that holds all widgets and aggregate data.
     """
+    _padx = 8
+    _pady = 3
 
     def __init__(self, main_window, parentFrame, case_instance: CaseInstance):
         self.main_window = main_window
@@ -44,38 +47,56 @@ class CaseTab:
         self.containerBody.add(self.entry_space, sticky='wns')
 
         if int(self.data.id) > 0:
-            self.com_frame_outline = tk.LabelFrame(self.containerBody, text="Comments")
+            self.com_frame_outline = tk.LabelFrame(self.containerBody, text="Steps")
             self.com_frame = ScrolledFrame(self.com_frame_outline)
             self.com_frame.pack(anchor=tk.NW, fill=tk.BOTH, expand=True)
             self.containerBody.add(self.com_frame_outline, sticky='nse')
 
-        self.tDescription = tk.Text(self.entry_space)
         self.lId = tk.Label(self.entry_space)
-        self.eName = tk.Entry(self.entry_space)
         self.lApplicant = tk.Label(self.entry_space)
-
-        self.cbStatus = ttk.Combobox(self.entry_space)
         self.lCreate_time = tk.Label(self.entry_space)
         self.lModify_time = tk.Label(self.entry_space)
         self.lModify_by = tk.Label(self.entry_space)
 
-        self.bAktualizuj = ttk.Button(self.but_line,
-                                      text="Aktualizuj",
-                                      command=self.update)
+        self.cbPriori = ttk.Combobox(self.entry_space)
+        self.cbStatus = ttk.Combobox(self.entry_space)
+
+        self.eName = tk.Entry(self.entry_space)
+        self.tDescription = tk.Text(self.entry_space)
+        self.tObjective = tk.Text(self.entry_space)
+        self.tExpected = tk.Text(self.entry_space)
+        self.tPost = tk.Text(self.entry_space)
+
+        self.bUpdate = ttk.Button(self.but_line,
+                                  text="Aktualizuj",
+                                  command=self.update)
         self.bSave = ttk.Button(self.but_line,
                                 text="Zapisz",
                                 command=self.save_case_body)
 
         if int(self.data.id) > 0:
-            # self.new_comment = False
             self.dic_steps_gallery = {}
             self.case_steps = Steps()
             self.display_steps()
 
-        self.update_comment = False
+        # self.update_comment = False
 
         self.buttons()
-        self.entries()
+        try:
+            self.labels()
+        except Exception as e:
+            print(e)
+            raise
+        try:
+            self.comboboxes()
+        except Exception as e:
+            print(e)
+            raise
+        try:
+            self.entries()
+        except Exception as e:
+            print(e)
+            raise
 
         # New case_instance has id =0 -> explicit False
         self.control(case_instance.id)
@@ -102,7 +123,7 @@ class CaseTab:
         :return:
         """
         if int(self.data.id) > 0:
-            self.bAktualizuj.grid(row=0, column=self.button_column, sticky='nsw')
+            self.bUpdate.grid(row=0, column=self.button_column, sticky='nsw')
         else:
             self.bSave.grid(row=0, column=self.button_column, sticky='nsw')
 
@@ -123,81 +144,86 @@ class CaseTab:
         bClose = ttk.Button(self.but_line, text="Zamknij", command=self.main_window.close_current_tab)
         bClose.grid(row=0, column=self.button_column, sticky='nse')
 
-    def entries(self):
+    def labels(self):
         """
-        Aggregate entries, inputs and other widgets to display data.
+        Aggregate static data to display on UI.
+        With some drop dawns.
         :return:
         """
         labelRow = 0
-        _padx = 8
-        _pady = 3
-        # todo dorobic labelki koło pozycji do wpisywanai tekstu. lub w label framy.
         self.lId = ttk.Label(self.entry_space,
                              text="Id\n{}".format(self.data.id),
                              justify=tk.CENTER)
         self.lId.grid(row=labelRow,
                       column=0,
-                      padx=_padx)
+                      padx=CaseTab._padx)
 
         self.lCreate_time = ttk.Label(self.entry_space,
                                       text="Stworzono\n{}".format(str(self.data.create_time)),
                                       justify=tk.CENTER)
         self.lCreate_time.grid(row=labelRow,
                                column=1,
-                               padx=_padx)
+                               padx=CaseTab._padx)
 
         self.lApplicant = ttk.Label(self.entry_space,
-                                    text="Zgłaszający\n{}".format(dict_accounts.get_name(str(self.data.applicant))),
+                                    text="Twórca\n{}".format(dict_accounts.get_name(str(self.data.applicant))),
                                     justify=tk.CENTER)
         self.lApplicant.grid(row=labelRow,
                              column=2,
-                             padx=_padx)
+                             padx=CaseTab._padx)
 
         self.lModify_time = ttk.Label(self.entry_space,
-                                      text="Zmodyfikowano\n{}".format(str(self.data.modify_time))
-                                      , justify=tk.CENTER)
+                                      text="Zmodyfikowano\n{}".format(str(self.data.modify_time)),
+                                      justify=tk.CENTER)
         self.lModify_time.grid(row=labelRow,
                                column=3,
-                               padx=_padx)
+                               padx=CaseTab._padx)
 
         self.lModify_by = ttk.Label(self.entry_space,
-                                    text="Modifikowany przez\n{}".format(dict_accounts.get_name(str(self.data.modify_by))),
+                                    text="Modifikowany przez\n{}".format(
+                                        dict_accounts.get_name(str(self.data.modify_by))),
                                     justify=tk.CENTER)
         self.lModify_by.grid(row=labelRow,
                              column=4,
-                             padx=_padx)
+                             padx=CaseTab._padx)
 
-        l_status = tk.Label(self.entry_space, text="Status :")
-        l_status.grid(row=1,
-                      column=0,
-                      padx=_padx,
-                      pady=_pady)
+    def comboboxes(self):
+        l_priority = tk.Label(self.entry_space, text="Priority :")
+        l_priority.grid(row=1,
+                        column=0,
+                        padx=CaseTab._padx,
+                        pady=CaseTab._pady)
 
         # if str(self.data.status) == str(dict_case_status.close_status) or user.user_type == dict_account_type.admin:
-        if user.user_type == dict_account_type.admin:
-            self.cbStatus.configure(value=dict_case_status.names)
-        else:
-            self.cbStatus.configure(value=dict_case_status.names_unclose)
+        self.cbPriori.configure(value=dict_priority.names)
 
+        self.cbPriori.set(dict_priority.get_name(self.data.priority))
+        self.cbPriori.grid(row=1,
+                           column=1,
+                           padx=CaseTab._padx,
+                           pady=CaseTab._pady)
+
+        l_assigned = tk.Label(self.entry_space, text="Status :")
+        l_assigned.grid(row=1,
+                        column=2,
+                        padx=CaseTab._padx,
+                        pady=CaseTab._pady)
+
+        self.cbStatus.configure(value=dict_case_status.names)
         self.cbStatus.set(dict_case_status.get_name(self.data.status))
         self.cbStatus.grid(row=1,
-                           column=1,
-                           padx=_padx,
-                           pady=_pady)
+                           column=3,
+                           padx=CaseTab._padx,
+                           pady=CaseTab._pady)
 
-        l_assigned = tk.Label(self.entry_space, text="Przypisany :")
-        l_assigned.grid(row=1,
-                        column=3,
-                        padx=_padx,
-                        pady=_pady)
-
+    def entries(self):
         self.eName = tk.Text(self.entry_space,
                              wrap=tk.WORD,
                              height=2)
         self.eName.grid(row=2,
                         column=0,
                         columnspan=5,
-                        pady=_pady,
+                        pady=CaseTab._pady,
                         sticky='wn')
         self.eName.insert('1.0', self.data.name)
 
@@ -208,8 +234,32 @@ class CaseTab:
         self.tDescription.grid(row=3,
                                column=0,
                                columnspan=5,
-                               pady=_pady,
+                               pady=CaseTab._pady,
                                sticky='wn')
+
+        self.tObjective.configure(wrap=tk.WORD, height=8)
+        self.tObjective.grid(row=4,
+                             column=0,
+                             columnspan=5,
+                             pady=CaseTab._pady,
+                             sticky='wn')
+        self.tObjective.insert('1.0', self.data.objective)
+
+        self.tExpected.configure(wrap=tk.WORD, height=5)
+        self.tExpected.grid(row=5,
+                            column=0,
+                            columnspan=5,
+                            pady=CaseTab._pady,
+                            sticky='wn')
+        self.tExpected.insert('1.0', self.data.expected_result)
+
+        self.tPost.configure(wrap=tk.WORD, height=5)
+        self.tPost.grid(row=6,
+                        column=0,
+                        columnspan=5,
+                        pady=CaseTab._pady,
+                        sticky='wn')
+        self.tPost.insert('1.0', self.data.post_condition)
 
     def display_steps(self):
         """
@@ -244,11 +294,12 @@ class CaseTab:
             text = name
 
         def save():
-            if name != "":  # porównanie czy jest to Updatowy komentarz. jak będzie więcej porównać z listą .
-                description = "{}\n{}".format(name, e_text.get("1.0", 'end-1c'))
-                self.update_comment = True
-            else:
-                description = e_text.get("1.0", 'end-1c')
+            # if name != "":  # porównanie czy jest to Updatowy komentarz. jak będzie więcej porównać z listą .
+            #     description = "{}\n{}".format(name, e_text.get("1.0", 'end-1c'))
+            #     self.update_comment = True
+            # else:
+            description = e_text.get("1.0", 'end-1c')
+
             if self.save_step(description) == 1:
                 self.update()
             popup.destroy()
@@ -302,8 +353,12 @@ class CaseTab:
             cb_state = "readonly"
         self.tDescription.configure(state=state)
         self.eName.configure(state=state)
+        self.tObjective.configure(state=state)
+        self.tExpected.configure(state=state)
+        self.tPost.configure(state=state)
+        self.cbPriori.configure(state=cb_state)
         self.cbStatus.configure(state=cb_state)
-        self.bAktualizuj.configure(state=state)
+        self.bUpdate.configure(state=state)
 
     def destroy(self):
         """
@@ -320,7 +375,7 @@ class CaseTab:
         """
         self.data.description = self.tDescription.get("1.0", 'end-1c')
         self.data.name = self.eName.get("1.0", 'end-1c')
-        self.data.status = dict_case_status.index(self.cbStatus.get())
+        self.data.status = dict_case_status.index(self.cbPriori.get())
 
         if case_collection.send_new_delate(self.data):
             self.main_window.navigator.populate_delate_list()
@@ -337,18 +392,23 @@ class CaseTab:
         zbierz dane z inputów i przeslij do serwera.
         :return:
         """
-        if str(self.data.status) != str(dict_case_status.index(self.cbStatus.get())):
-            if self.update_comment:
-                self.update_comment = False
-            else:
-                self.add_step_popup(
-                    "Zmiana statusu {} -> {}".format(dict_case_status.get_name(self.data.status), self.cbStatus.get()))
-                return
+        # if str(self.data.status) != str(dict_case_status.index(self.cbPriori.get())):
+        #     if self.update_comment:
+        #         self.update_comment = False
+        #     else:
+        #         self.add_step_popup(
+        #             "Zmiana statusu {} -> {}".format(dict_case_status.get_name(self.data.status), self.cbPriori.get()))
+        #         return
 
         self.data.description = self.tDescription.get("1.0", 'end-1c')
+        self.data.objective = self.tObjective.get("1.0", 'end-1c')
+        self.data.expected_result = self.tExpected.get("1.0", 'end-1c')
+        self.data.post_condition = self.tPost.get("1.0", 'end-1c')
+
         name_change = (self.data.name != self.eName.get("1.0", 'end-1c'))
         if name_change:
             self.data.name = self.eName.get("1.0", 'end-1c')
+        self.data.priority = dict_priority.index(self.cbPriori.get())
         self.data.status = dict_case_status.index(self.cbStatus.get())
 
         if case_collection.save_case(self.data):
@@ -377,12 +437,21 @@ class CaseTab:
 
         self.eName.delete("1.0", tk.END)
         self.tDescription.delete("1.0", tk.END)
+        self.tObjective.delete('1.0', tk.END)
+        self.tExpected.delete('1.0', tk.END)
+        self.tPost.delete('1.0', tk.END)
 
         self.eName.insert('1.0', self.data.name)
         self.tDescription.insert('1.0', self.data.description)
+        self.tObjective.insert('1.0', self.data.objective)
+        self.tExpected.insert('1.0', self.data.expected_result)
+        self.tPost.insert('1.0', self.data.post_condition)
+
         self.cbStatus.set(dict_case_status.get_name(self.data.status))
+        self.cbPriori.set(dict_priority.get_name(self.data.priority))
         self.lModify_time.configure(text="Zmodyfikowano\n{}".format(str(self.data.modify_time)))
-        self.lModify_by.configure(text="Modifikowany przez\n{}".format(dict_accounts.get_name(str(self.data.modify_by))))
+        self.lModify_by.configure(
+            text="Modifikowany przez\n{}".format(dict_accounts.get_name(str(self.data.modify_by))))
 
         if self.data.id != 0:
             self.control(True)

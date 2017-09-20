@@ -75,7 +75,7 @@ class Case:
         :param chunk: Json that holds data to populate CaseInstance
         :return:
         """
-        self.delateDict[int(chunk[CaseData.ID])] = CaseInstance(chunk)
+        self.delateDict[int(chunk[CaseData.ID])] = CaseInstance(**chunk)
         if int(chunk[CaseData.ID]) not in self.delateList:
             self.delateList.append(int(chunk[CaseData.ID]))
 

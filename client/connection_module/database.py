@@ -6,6 +6,7 @@ from client.connection_module.connect_base import ConnectBase
 from client.data_config import CaseData, CaseSteps, Accounts, BasicSHDict
 from client.data_config import StepData
 from client.user import user
+from client.case_body import CaseInstance
 
 
 class Database(ConnectBase):
@@ -112,7 +113,7 @@ class Database(ConnectBase):
             raise
         return self._read_data(self.cursor.fetchall())
 
-    def put_case(self, case):
+    def put_case(self, case: CaseInstance):
         sql = "UPDATE [sh.TestCase] SET {} WHERE {}"
         sql = sql.format(case.put_data(), "{} = '{}'".format(CaseData.ID, case.id))
         print(sql)
