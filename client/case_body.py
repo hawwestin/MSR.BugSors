@@ -11,8 +11,8 @@ class CaseInstance:
         self.id = None
         self._name = None
         self._description = ""
-        self._status = None
-        self._priority = None
+        self._status = ""
+        self._priority = ""
         self._objective = ""
         self._expected_result = ""
         self._post_condition = ""

@@ -24,55 +24,84 @@ class CaseTab:
     _padx = 8
     _pady = 3
 
-    def __init__(self, main_window, parentFrame, case_instance: CaseInstance):
+    def __init__(self, main_window: tk.Tk, inner_frame: tk.Frame, case_instance: CaseInstance):
         self.main_window = main_window
-        self.parent_frame = parentFrame
+        self.parent_frame = inner_frame
         self.data = case_instance
 
-        self.delFrame = tk.Frame(parentFrame)
-        self.delFrame.pack(anchor=tk.NW, fill=tk.BOTH, expand=True)
-        self.but_line = tk.Frame(self.delFrame, relief=tk.SUNKEN)
+        self.parent_frame.pack(anchor=tk.NW, fill=tk.BOTH, expand=True)
+        self.but_line = tk.Frame(self.parent_frame, relief=tk.SUNKEN, name="button_line")
         self.but_line.pack(side=tk.TOP, anchor=tk.NW)
+
         self.__column = 0
 
-        self.containerBody = tk.PanedWindow(self.delFrame,
-                                            sashwidth=6,
-                                            showhandle=True,
-                                            sashrelief=tk.RIDGE,
-                                            handlesize=11)
-        self.containerBody.pack(fill=tk.BOTH, expand=True)
+        self.pannedContainer = tk.PanedWindow(self.parent_frame,
+                                              sashwidth=6,
+                                              showhandle=True,
+                                              sashrelief=tk.RIDGE,
+                                              handlesize=11,
+                                              name="pannedContainer")
+        self.pannedContainer.pack(fill=tk.BOTH, expand=True)
 
-        self.entry_space = tk.Frame(self.containerBody)
-        # self.entry_space.pack(side=tk.LEFT, anchor=tk.NW, fill=tk.BOTH, expand=True)
-        self.containerBody.add(self.entry_space, sticky='wns')
+        self.entries = tk.Frame(self.pannedContainer, name="entries")
+        self.entries.pack(
+            # side=tk.LEFT,
+            anchor=tk.NW,
+            fill=tk.BOTH,
+            expand=True)
+        self.pannedContainer.add(self.entries, sticky='wns')
 
-        if int(self.data.id) > 0:
-            self.com_frame_outline = tk.LabelFrame(self.containerBody, text="Steps")
-            self.com_frame = ScrolledFrame(self.com_frame_outline)
-            self.com_frame.pack(anchor=tk.NW, fill=tk.BOTH, expand=True)
-            self.containerBody.add(self.com_frame_outline, sticky='nse')
+        self.steps_label_frame = tk.LabelFrame(self.pannedContainer, text="Steps", name="steps_label_frame")
+        # todo here add buttons for steps
+        self.steps_scrolled_frame = ScrolledFrame(self.steps_label_frame, name="steps_scrolled_frame")
+        self.steps_scrolled_frame.pack(anchor=tk.NW, fill=tk.BOTH, expand=True)
 
-        self.lId = tk.Label(self.entry_space)
-        self.lApplicant = tk.Label(self.entry_space)
-        self.lCreate_time = tk.Label(self.entry_space)
-        self.lModify_time = tk.Label(self.entry_space)
-        self.lModify_by = tk.Label(self.entry_space)
+        self.pannedContainer.add(self.steps_label_frame, sticky='nse')
 
-        self.cbPriori = ttk.Combobox(self.entry_space)
-        self.cbStatus = ttk.Combobox(self.entry_space)
+        self.lId = tk.Label(self.entries)
+        self.lApplicant = tk.Label(self.entries)
+        self.lCreate_time = tk.Label(self.entries)
+        self.lModify_time = tk.Label(self.entries)
+        self.lModify_by = tk.Label(self.entries)
 
-        self.eName = tk.Entry(self.entry_space)
-        self.tDescription = tk.Text(self.entry_space)
-        self.tObjective = tk.Text(self.entry_space)
-        self.tExpected = tk.Text(self.entry_space)
-        self.tPost = tk.Text(self.entry_space)
+        self.cbPriori = ttk.Combobox(self.entries)
+        self.cbStatus = ttk.Combobox(self.entries)
+
+        # self.tDescription.pack(side=tk.RIGHT, fill=tk.BOTH, expand=True)
+        lf_name = tk.LabelFrame(self.entries, text="Name", name="lf_name")
+        lf_name.grid(row=2,
+                     column=0,
+                     columnspan=5)
+        self.eName = tk.Text(lf_name)
+        lf_description = tk.LabelFrame(self.entries, text="Description", name="lf_description")
+        lf_description.grid(row=3,
+                            column=0,
+                            columnspan=5)
+        self.tDescription = tk.Text(lf_description)
+        lf_objective = tk.LabelFrame(self.entries, text="Objective", name="lf_objective")
+        lf_objective.grid(row=4,
+                          column=0,
+                          columnspan=5)
+        self.tObjective = tk.Text(lf_objective)
+        lf_expected = tk.LabelFrame(self.entries, text="Expected results", name="lf_expected")
+        lf_expected.grid(row=5,
+                         column=0,
+                         columnspan=5)
+        self.tExpected = tk.Text(lf_expected)
+        lf_post = tk.LabelFrame(self.entries, text="Post conditions", name="lf_post")
+        lf_post.grid(row=6,
+                     column=0,
+                     columnspan=5)
+        self.tPost = tk.Text(lf_post)
 
         self.bUpdate = ttk.Button(self.but_line,
                                   text="Aktualizuj",
-                                  command=self.update)
+                                  command=self.update,
+                                  name="update")
         self.bSave = ttk.Button(self.but_line,
                                 text="Zapisz",
-                                command=self.save_case_body)
+                                command=self.save_case_body,
+                                name="save")
 
         if int(self.data.id) > 0:
             self.dic_steps_gallery = {}
@@ -93,7 +122,7 @@ class CaseTab:
             print(e)
             raise
         try:
-            self.entries()
+            self.entries_manager()
         except Exception as e:
             print(e)
             raise
@@ -151,35 +180,35 @@ class CaseTab:
         :return:
         """
         labelRow = 0
-        self.lId = ttk.Label(self.entry_space,
+        self.lId = ttk.Label(self.entries,
                              text="Id\n{}".format(self.data.id),
                              justify=tk.CENTER)
         self.lId.grid(row=labelRow,
                       column=0,
                       padx=CaseTab._padx)
 
-        self.lCreate_time = ttk.Label(self.entry_space,
+        self.lCreate_time = ttk.Label(self.entries,
                                       text="Stworzono\n{}".format(str(self.data.create_time)),
                                       justify=tk.CENTER)
         self.lCreate_time.grid(row=labelRow,
                                column=1,
                                padx=CaseTab._padx)
 
-        self.lApplicant = ttk.Label(self.entry_space,
+        self.lApplicant = ttk.Label(self.entries,
                                     text="Twórca\n{}".format(dict_accounts.get_name(str(self.data.applicant))),
                                     justify=tk.CENTER)
         self.lApplicant.grid(row=labelRow,
                              column=2,
                              padx=CaseTab._padx)
 
-        self.lModify_time = ttk.Label(self.entry_space,
+        self.lModify_time = ttk.Label(self.entries,
                                       text="Zmodyfikowano\n{}".format(str(self.data.modify_time)),
                                       justify=tk.CENTER)
         self.lModify_time.grid(row=labelRow,
                                column=3,
                                padx=CaseTab._padx)
 
-        self.lModify_by = ttk.Label(self.entry_space,
+        self.lModify_by = ttk.Label(self.entries,
                                     text="Modifikowany przez\n{}".format(
                                         dict_accounts.get_name(str(self.data.modify_by))),
                                     justify=tk.CENTER)
@@ -188,7 +217,7 @@ class CaseTab:
                              padx=CaseTab._padx)
 
     def comboboxes(self):
-        l_priority = tk.Label(self.entry_space, text="Priority :")
+        l_priority = tk.Label(self.entries, text="Priority :")
         l_priority.grid(row=1,
                         column=0,
                         padx=CaseTab._padx,
@@ -203,7 +232,7 @@ class CaseTab:
                            padx=CaseTab._padx,
                            pady=CaseTab._pady)
 
-        l_assigned = tk.Label(self.entry_space, text="Status :")
+        l_assigned = tk.Label(self.entries, text="Status :")
         l_assigned.grid(row=1,
                         column=2,
                         padx=CaseTab._padx,
@@ -216,10 +245,8 @@ class CaseTab:
                            padx=CaseTab._padx,
                            pady=CaseTab._pady)
 
-    def entries(self):
-        self.eName = tk.Text(self.entry_space,
-                             wrap=tk.WORD,
-                             height=2)
+    def entries_manager(self):
+        self.eName.configure(wrap=tk.WORD, height=2)
         self.eName.grid(row=2,
                         column=0,
                         columnspan=5,
@@ -227,9 +254,7 @@ class CaseTab:
                         sticky='wn')
         self.eName.insert('1.0', self.data.name)
 
-        self.tDescription = tk.Text(self.entry_space,
-                                    wrap=tk.WORD)
-        # self.tDescription.pack(side=tk.RIGHT, fill=tk.BOTH, expand=True)
+        self.tDescription.configure(wrap=tk.WORD)
         self.tDescription.insert('1.0', self.data.description)
         self.tDescription.grid(row=3,
                                column=0,
@@ -266,9 +291,9 @@ class CaseTab:
         Reset current added steps and fetch from current connection new list.
         :return:
         """
-        self.com_frame.destroy()
-        self.com_frame = ScrolledFrame(self.com_frame_outline)
-        self.com_frame.pack(anchor=tk.NW, fill=tk.BOTH, expand=True)
+        self.steps_scrolled_frame.destroy()
+        self.steps_scrolled_frame = ScrolledFrame(self.steps_label_frame)
+        self.steps_scrolled_frame.pack(anchor=tk.NW, fill=tk.BOTH, expand=True)
 
         steps_order = com_switch.connection.get_steps(self.data.id)
         items = self.case_steps.sort_case_steps(steps_order)
@@ -277,7 +302,7 @@ class CaseTab:
             # todo statusbar
             return
         for idx, data_step in enumerate(items):
-            frame = tk.LabelFrame(self.com_frame.interior)
+            frame = tk.LabelFrame(self.steps_scrolled_frame.interior)
             frame.pack(fill=tk.BOTH, expand=True, anchor='nw')
             self.dic_steps_gallery[idx] = StepInstance(frame, data_step)
 
@@ -368,14 +393,26 @@ class CaseTab:
         # todo inform window.notebook about it ?
         self.parent_frame.destroy()
 
+    def _fetch_data(self):
+        self.data.description = self.tDescription.get("1.0", 'end-1c')
+        self.data.objective = self.tObjective.get("1.0", 'end-1c')
+        self.data.expected_result = self.tExpected.get("1.0", 'end-1c')
+        self.data.post_condition = self.tPost.get("1.0", 'end-1c')
+        self.data.priority = dict_priority.index(self.cbPriori.get())
+        self.data.status = dict_case_status.index(self.cbStatus.get())
+
+        name_change = (self.data.name != self.eName.get("1.0", 'end-1c'))
+        if name_change:
+            self.data.name = self.eName.get("1.0", 'end-1c')
+
+        return name_change
+
     def save_case_body(self):
         """
         odsyła na serwer wprowadzone dane w pola , jeżeli odesłano z sukcesem zamyka karte i dodaje do listy
         :return:
         """
-        self.data.description = self.tDescription.get("1.0", 'end-1c')
-        self.data.name = self.eName.get("1.0", 'end-1c')
-        self.data.status = dict_case_status.index(self.cbPriori.get())
+        self._fetch_data()
 
         if case_collection.send_new_delate(self.data):
             self.main_window.navigator.populate_delate_list()
@@ -399,17 +436,7 @@ class CaseTab:
         #         self.add_step_popup(
         #             "Zmiana statusu {} -> {}".format(dict_case_status.get_name(self.data.status), self.cbPriori.get()))
         #         return
-
-        self.data.description = self.tDescription.get("1.0", 'end-1c')
-        self.data.objective = self.tObjective.get("1.0", 'end-1c')
-        self.data.expected_result = self.tExpected.get("1.0", 'end-1c')
-        self.data.post_condition = self.tPost.get("1.0", 'end-1c')
-
-        name_change = (self.data.name != self.eName.get("1.0", 'end-1c'))
-        if name_change:
-            self.data.name = self.eName.get("1.0", 'end-1c')
-        self.data.priority = dict_priority.index(self.cbPriori.get())
-        self.data.status = dict_case_status.index(self.cbStatus.get())
+        name_change = self._fetch_data()
 
         if case_collection.save_case(self.data):
             self.main_window.navigator.populate_delate_list()

@@ -35,9 +35,11 @@ class Case:
                  CaseData.DESCRIPTION: "Opis",
                  CaseData.APPLICANT: user.user_id,
                  CaseData.CREATE_TIME: datetime.datetime.now(),  # todo czas bez mikrosekund jest zwracany przez serwer.
-                 CaseData.STATUS: 1,
+                 CaseData.STATUS: "1",
+                 CaseData.PRIORITY: "2",
                  CaseData.MODIFY_TIME: None,
-                 CaseData.MODIFY_BY: None}
+                 CaseData.MODIFY_BY: None,
+                 CaseData.IS_ACTIVE: True}
         self.__insert_delate_to_dict_collection(chunk)
         return self.delateDict.get(0)
 
