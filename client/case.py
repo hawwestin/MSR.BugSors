@@ -91,6 +91,7 @@ class Case:
         :return:
         """
         ret = com_switch.connection.post_case(case)
+        ret = com_switch.connection.get_case_by_id(ret)
         if ret != "":
             self.__insert_delate_to_dict_collection(ret[0])
             # todo clear from dict and list item with id 0 to add next item clear.

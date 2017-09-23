@@ -17,7 +17,7 @@ class Database(ConnectBase):
             adres : path to database file.
         '''
         self.connection = None
-        self.cursor = None
+        self._cursor = None
         self.db_path = None
         self.configure(kwargs.get('adres', "../db/test_local.db"))
 
@@ -40,6 +40,14 @@ class Database(ConnectBase):
             # todo statusbar Logger
             raise
         self.connection.execute("PRAGMA FOREIGN_KEYS = 1")
+
+    @property
+    def cursor(self) -> sqlite3.Connection.cursor:
+        return self._cursor
+
+    @cursor.setter
+    def cursor(self, value):
+        self._cursor = value
 
     def __del__(self):
         if self.connection is not None:
@@ -158,6 +166,12 @@ class Database(ConnectBase):
         return self._read_data(self.cursor.fetchall())
 
     def post_case(self, case):
+        """
+        send new data to be inserted
+        return instance from db with id of inserted row.
+        :param case:
+        :return:
+        """
         sql = "INSERT INTO [sh.TestCase] ({0}) VALUES ({1});"
         values = case.post_data()
 
@@ -165,11 +179,14 @@ class Database(ConnectBase):
         print(sql)
         try:
             self.cursor.execute(sql)
+            print(self.cursor.lastrowid)
         except sqlite3.IntegrityError:
             # todo statusbar logger
             raise
         else:
             self.connection.commit()
+        # todo return inserted row
+        return self.cursor.lastrowid
 
     def authenticate(self) -> bool:
         """
@@ -227,6 +244,7 @@ class Database(ConnectBase):
             raise
         else:
             self.connection.commit()
+        return self.cursor.lastrowid
 
     def add_user(self, user):
         pass
