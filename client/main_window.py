@@ -4,13 +4,13 @@ import tkinter as tk
 from tkinter import ttk
 
 import client.utils as utils
-from client.case_tab import CaseTab
+from client.bs_tab.case_tab import CaseTab
 from client.case import case_collection
-from client.menu_bar import *
-from client.nav_panel import NavPanel
-from client.connection_module import com_switch
 from client.connection_module import Database
+from client.connection_module import com_switch
+from client.menu_bar import *
 from client.menu_command import MenuCmd
+from client.nav_panel import NavPanel
 
 
 class Window(tk.Tk):

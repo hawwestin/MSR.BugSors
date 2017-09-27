@@ -6,7 +6,7 @@ from client.connection_module.connect_base import ConnectBase
 from client.data_config import CaseData, CaseSteps, Accounts, BasicSHDict
 from client.data_config import StepData
 from client.user import user
-from client.case_body import CaseInstance
+from client.case_body import CaseBody
 
 
 class Database(ConnectBase):
@@ -121,7 +121,7 @@ class Database(ConnectBase):
             raise
         return self._read_data(self.cursor.fetchall())
 
-    def put_case(self, case: CaseInstance):
+    def put_case(self, case: CaseBody):
         sql = "UPDATE [sh.TestCase] SET {} WHERE {}"
         sql = sql.format(case.put_data(), "{} = '{}'".format(CaseData.ID, case.id))
         print(sql)
@@ -165,7 +165,7 @@ class Database(ConnectBase):
             raise
         return self._read_data(self.cursor.fetchall())
 
-    def post_case(self, case):
+    def post_case(self, case: CaseBody):
         """
         send new data to be inserted
         return instance from db with id of inserted row.
@@ -277,7 +277,7 @@ if __name__ == '__main__':
     # data[CaseData.POST_CONDITION] = 'post cond23'
     # data[CaseData.MODIFY_BY] = '2'
     # data[CaseData.IS_ACTIVE] = 'true'
-    # case = CaseInstance(data)
+    # case = CaseBody(data)
     # db.put_case(case)
     user.login = "robaszew"
     user.password = "truecrypt"

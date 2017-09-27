@@ -4,7 +4,7 @@ from client.data_config import dict_accounts
 
 
 # todo rename na body
-class CaseInstance:
+class CaseBody:
     def __init__(self, **kwargs):
         # todo remake to kwargs
 
@@ -23,7 +23,7 @@ class CaseInstance:
         self.modify_time = None
         self._modify_by = ""
         self.modify_by = None
-        self.is_active = None
+        self._is_active = None
 
         self.data = dict(kwargs)
         self.update(**kwargs)
@@ -52,6 +52,19 @@ class CaseInstance:
         self.is_active = value.get(CaseData.IS_ACTIVE, self.is_active)
 
         self.data.update(value)
+
+    @property
+    def is_active(self):
+        return  self._is_active
+
+    @is_active.setter
+    def is_active(self, value):
+        if value is None or value == 0 or value is False or value == "False":
+            self._is_active = "False"
+            self.data.update({CaseData.IS_ACTIVE: "False"})
+        else:
+            self._is_active = "True"
+            self.data.update({CaseData.IS_ACTIVE: "True"})
 
     @property
     def description(self):
@@ -171,5 +184,5 @@ if __name__ == '__main__':
     data[CaseData.APPLICANT] = '1'
     data[CaseData.IS_ACTIVE] = '1'
 
-    case = CaseInstance(**data)
+    case = CaseBody(**data)
     print(case.post_data())

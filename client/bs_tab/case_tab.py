@@ -2,7 +2,7 @@ import datetime
 import tkinter as tk
 from tkinter import ttk
 
-from client.case_body import CaseInstance
+from client.case_body import CaseBody
 from client.case import case_collection
 from client.connection_module import com_switch
 from client.data_config import StepData
@@ -24,7 +24,7 @@ class CaseTab:
     _padx = 8
     _pady = 3
 
-    def __init__(self, main_window: tk.Tk, inner_frame: tk.Frame, case_instance: CaseInstance):
+    def __init__(self, main_window: tk.Tk, inner_frame: tk.Frame, case_instance: CaseBody):
         self.main_window = main_window
         self.parent_frame = inner_frame
         self.data = case_instance
@@ -35,6 +35,9 @@ class CaseTab:
 
         self.__column = 0
 
+        """
+        Create main panned window : Left for text area's from case body. Right for steps list 
+        """
         self.pannedContainer = tk.PanedWindow(self.parent_frame,
                                               sashwidth=6,
                                               showhandle=True,
@@ -43,7 +46,11 @@ class CaseTab:
                                               name="pannedContainer")
         self.pannedContainer.pack(fill=tk.BOTH, expand=True)
 
-        self.entries = tk.Frame(self.pannedContainer, name="entries")
+        """
+        Frame for case text areas and buttons to manipulate data. 
+        """
+        # todo insert entries in scrolled window.
+        self.entries = tk.Frame(self.pannedContainer, name="case_entries")
         self.entries.pack(
             # side=tk.LEFT,
             anchor=tk.NW,
@@ -52,12 +59,18 @@ class CaseTab:
         self.pannedContainer.add(self.entries, sticky='wns')
 
         self.steps_label_frame = tk.LabelFrame(self.pannedContainer, text="Steps", name="steps_label_frame")
-        # todo here add buttons for steps
         self.steps_scrolled_frame = ScrolledFrame(self.steps_label_frame, name="steps_scrolled_frame")
         self.steps_scrolled_frame.pack(anchor=tk.NW, fill=tk.BOTH, expand=True)
-
         self.pannedContainer.add(self.steps_label_frame, sticky='nse')
 
+        """
+        Widgets for step list management
+        """
+        # todo here add buttons for steps
+
+        """
+        Widgets for Case body
+        """
         self.lId = tk.Label(self.entries)
         self.lApplicant = tk.Label(self.entries)
         self.lCreate_time = tk.Label(self.entries)
@@ -67,7 +80,14 @@ class CaseTab:
         self.cbPriori = ttk.Combobox(self.entries)
         self.cbStatus = ttk.Combobox(self.entries)
 
-        # self.tDescription.pack(side=tk.RIGHT, fill=tk.BOTH, expand=True)
+        self.chActiveVar = tk.IntVar()
+        self.chActiveVar.set(1 if self.data.is_active == "True" else 0)
+        self.chActive = tk.Checkbutton(self.entries, text="Active", variable=self.chActiveVar)
+
+        """
+        Text areas in dedicated Label frame for UX
+        """
+        # self.x.pack(side=tk.RIGHT, fill=tk.BOTH, expand=True)
         lf_name = tk.LabelFrame(self.entries, text="Name", name="lf_name")
         lf_name.grid(row=2,
                      column=0,
@@ -94,6 +114,9 @@ class CaseTab:
                      columnspan=5)
         self.tPost = tk.Text(lf_post)
 
+        """
+        Buttons widgets objects 
+        """
         self.bUpdate = ttk.Button(self.but_line,
                                   text="Aktualizuj",
                                   command=self.update,
@@ -103,13 +126,13 @@ class CaseTab:
                                 command=self.save_case_body,
                                 name="save")
 
-        if int(self.data.id) > 0:
-            self.dic_steps_gallery = {}
-            self.case_steps = Steps()
-            self.display_steps()
+        self.dic_steps_gallery = {}
+        self.case_steps = Steps()
+        self.display_steps()
 
-        # self.update_comment = False
-
+        """
+        Configure widgets
+        """
         self.buttons()
         try:
             self.labels()
@@ -158,7 +181,7 @@ class CaseTab:
 
         if int(self.data.id) > 0:
             bEdit = ttk.Button(self.but_line, text="Edytuj",
-                               command=self.edit_control)
+                               command=self.toggle_control)
             bEdit.grid(row=0, column=self.button_column, sticky='nsw')
 
         bCancel = ttk.Button(self.but_line, text="Cofnij",
@@ -232,7 +255,7 @@ class CaseTab:
                            padx=CaseTab._padx,
                            pady=CaseTab._pady)
 
-        l_assigned = tk.Label(self.entries, text="Status :")
+        l_assigned = tk.Label(self.entries, text="Status automatyzacji :")
         l_assigned.grid(row=1,
                         column=2,
                         padx=CaseTab._padx,
@@ -242,6 +265,16 @@ class CaseTab:
         self.cbStatus.set(dict_case_status.get_name(self.data.status))
         self.cbStatus.grid(row=1,
                            column=3,
+                           padx=CaseTab._padx,
+                           pady=CaseTab._pady)
+
+        self.chActive.configure(text="Active")
+        if self.data.is_active == "True" or self.data.is_active is True:
+            self.chActive.select()
+        else:
+            self.chActive.deselect()
+        self.chActive.grid(row=1,
+                           column=4,
                            padx=CaseTab._padx,
                            pady=CaseTab._pady)
 
@@ -384,6 +417,7 @@ class CaseTab:
         self.cbPriori.configure(state=cb_state)
         self.cbStatus.configure(state=cb_state)
         self.bUpdate.configure(state=state)
+        self.chActive.configure(state=state)
 
     def destroy(self):
         """
@@ -400,6 +434,7 @@ class CaseTab:
         self.data.post_condition = self.tPost.get("1.0", 'end-1c')
         self.data.priority = dict_priority.index(self.cbPriori.get())
         self.data.status = dict_case_status.index(self.cbStatus.get())
+        self.data.is_active = self.chActiveVar.get()
 
         name_change = (self.data.name != self.eName.get("1.0", 'end-1c'))
         if name_change:
@@ -421,7 +456,7 @@ class CaseTab:
             # todo log status bar ... error handling.
             return None
 
-    def edit_control(self):
+    def toggle_control(self):
         self.control(disable=False)
 
     def update(self):
@@ -457,7 +492,7 @@ class CaseTab:
 
     def undo(self):
         """
-        Put again data from CaseInstance in data.
+        Put again data from CaseBody in data.
         :return:
         """
         self.control(False)

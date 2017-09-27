@@ -1,6 +1,6 @@
 import datetime
 
-from client.case_body import CaseInstance
+from client.case_body import CaseBody
 from client.connection_module import com_switch
 from client.data_config import CaseData
 from client.user import user
@@ -17,18 +17,18 @@ class Case:
         """
         '''
         key - int
-        value - CaseInstance
+        value - CaseBody
         '''
         self.delateDict = {}
         '''
-        items - int CaseInstance.Id
+        items - int CaseBody.Id
         '''
         self.delateList = []
 
-    def create_case_locally(self) -> CaseInstance:
+    def create_case_locally(self) -> CaseBody:
         """
-        Prepare new CaseInstance to be populated inside Case Tab.
-        :return: CaseInstance
+        Prepare new CaseBody to be populated inside Case Tab.
+        :return: CaseBody
         """
         chunk = {CaseData.ID: 0,
                  CaseData.NAME: "Nazwa",
@@ -73,17 +73,17 @@ class Case:
 
     def __insert_delate_to_dict_collection(self, chunk: dict):
         """
-        Aggregate CaseInstance in inner delateDict & DelateList.
-        :param chunk: Json that holds data to populate CaseInstance
+        Aggregate CaseBody in inner delateDict & DelateList.
+        :param chunk: Json that holds data to populate CaseBody
         :return:
         """
-        self.delateDict[int(chunk[CaseData.ID])] = CaseInstance(**chunk)
+        self.delateDict[int(chunk[CaseData.ID])] = CaseBody(**chunk)
         if int(chunk[CaseData.ID]) not in self.delateList:
             self.delateList.append(int(chunk[CaseData.ID]))
 
 
 
-    def send_new_delate(self, case: CaseInstance):
+    def send_new_delate(self, case: CaseBody):
         """
         Send new instance of case to persist it in DB.
         Append added delate
@@ -100,7 +100,7 @@ class Case:
             return 0
             # return self.fetch_case(ret[0].get(DD.ID, 0))
 
-    def save_case(self, case: CaseInstance):
+    def save_case(self, case: CaseBody):
         """
         Send request to connection 
         :param case: 
