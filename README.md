@@ -1,2 +1,4 @@
 # MSR.BugSors
-Test Menagment application dedicated to Test Case operations 
+Deskotp Test Menagment application dedicated to Test Case operations 
+
+Made using Tkinter and SQLite
